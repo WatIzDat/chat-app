@@ -9,6 +9,7 @@ public sealed class User : Entity
         Guid id,
         string username,
         Email email,
+        DateTimeOffset dateCreatedUtc,
         string aboutSection,
         List<Guid> discussions,
         List<Guid> roles)
@@ -16,6 +17,7 @@ public sealed class User : Entity
     {
         Username = username;
         Email = email;
+        DateCreatedUtc = dateCreatedUtc;
         AboutSection = aboutSection;
         Discussions = discussions;
         Roles = roles;
@@ -36,6 +38,7 @@ public sealed class User : Entity
     public static Result<User> Create(
         string username,
         Email email,
+        DateTimeOffset dateCreatedUtc,
         string aboutSection,
         List<Guid> discussions,
         List<Guid> roles)
@@ -72,7 +75,7 @@ public sealed class User : Entity
             return Result.Failure<User>(UserErrors.DuplicateRoles);
         }
 
-        User user = new(Guid.NewGuid(), username, email, aboutSection, discussions, roles);
+        User user = new(Guid.NewGuid(), username, email, dateCreatedUtc, aboutSection, discussions, roles);
 
         return Result.Success(user);
     }
