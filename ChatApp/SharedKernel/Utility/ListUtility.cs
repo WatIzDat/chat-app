@@ -2,8 +2,8 @@
 
 public static class ListUtility
 {
-    public static bool HasDuplicateGuids(List<Guid> list)
+    public static bool HasDuplicates<T>(List<T> list)
     {
-        return list.GroupBy(g => g).Any(g => g.Count() > 1);
+        return list.Count != list.Distinct().Count();
     }
 }

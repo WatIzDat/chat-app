@@ -60,7 +60,7 @@ public sealed class User : Entity
             return Result.Failure<User>(UserErrors.TooManyDiscussions);
         }
 
-        if (ListUtility.HasDuplicateGuids(discussions))
+        if (ListUtility.HasDuplicates(discussions))
         {
             return Result.Failure<User>(UserErrors.DuplicateDiscussions);
         }
@@ -70,7 +70,7 @@ public sealed class User : Entity
             return Result.Failure<User>(UserErrors.TooManyRoles);
         }
 
-        if (ListUtility.HasDuplicateGuids(roles))
+        if (ListUtility.HasDuplicates(roles))
         {
             return Result.Failure<User>(UserErrors.DuplicateRoles);
         }
