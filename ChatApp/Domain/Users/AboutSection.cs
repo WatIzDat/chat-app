@@ -2,7 +2,7 @@
 
 namespace Domain.Users;
 
-public sealed class AboutSection
+public sealed record AboutSection
 {
     public const int MaxLength = 200;
 

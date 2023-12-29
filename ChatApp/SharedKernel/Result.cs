@@ -4,7 +4,7 @@ public class Result
 {
     protected internal Result(bool isSuccess, Error error)
     {
-        if (!IsValidResult(isSuccess, error))
+        if (IsInvalidResult(isSuccess, error))
         {
             throw new ArgumentException("Invalid result.", nameof(error));
         }
@@ -39,7 +39,7 @@ public class Result
         return new(value: default, isSuccess: false, error);
     }
 
-    private static bool IsValidResult(bool isSuccess, Error error)
+    private static bool IsInvalidResult(bool isSuccess, Error error)
     {
         return isSuccess && error != Error.None ||
             !isSuccess && error == Error.None;
