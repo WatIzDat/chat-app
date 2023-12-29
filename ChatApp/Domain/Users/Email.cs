@@ -12,7 +12,7 @@ public sealed record Email
 
     public string Value { get; }
 
-    public static Result<Email> Create(string? value)
+    public static Result<Email> Create(string value)
     {
         if (string.IsNullOrEmpty(value))
         {
@@ -31,7 +31,9 @@ public sealed record Email
     {
         string trimmedEmail = value.Trim();
 
-        if (string.IsNullOrEmpty(value) || trimmedEmail.EndsWith('.'))
+        if (string.IsNullOrEmpty(value) ||
+            trimmedEmail.EndsWith('.') ||
+            trimmedEmail.Length > 254) // 254 characters is RFC specification
         {
             return false;
         }
