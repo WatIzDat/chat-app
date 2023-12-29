@@ -1,4 +1,5 @@
-﻿using SharedKernel;
+﻿using Domain.Discussions;
+using SharedKernel;
 using SharedKernel.Utility;
 
 namespace Domain.Users;
@@ -10,9 +11,9 @@ public sealed class User : Entity
         string username,
         Email email,
         DateTimeOffset dateCreatedUtc,
-        string aboutSection,
-        List<Guid> discussions,
-        List<Guid> roles)
+        AboutSection aboutSection,
+        DiscussionsList discussions,
+        RolesList roles)
         : base(id)
     {
         Username = username;
@@ -29,50 +30,23 @@ public sealed class User : Entity
 
     public DateTimeOffset DateCreatedUtc { get; private set; }
 
-    public string AboutSection { get; private set; }
+    public AboutSection AboutSection { get; private set; }
 
-    public List<Guid> Discussions { get; private set; }
+    public DiscussionsList Discussions { get; private set; }
 
-    public List<Guid> Roles { get; private set; }
+    public RolesList Roles { get; private set; }
 
     public static Result<User> Create(
         string username,
         Email email,
         DateTimeOffset dateCreatedUtc,
-        string aboutSection,
-        List<Guid> discussions,
-        List<Guid> roles)
+        AboutSection aboutSection,
+        DiscussionsList discussions,
+        RolesList roles)
     {
         if (username.Length > 20)
         {
             return Result.Failure<User>(UserErrors.UsernameTooLong);
-        }
-
-        aboutSection = aboutSection.ReplaceLineEndings("\r\n");
-
-        if (aboutSection.Length > 200)
-        {
-            return Result.Failure<User>(UserErrors.AboutSectionTooLong);
-        }
-
-        if (discussions.Count > 100)
-        {
-            return Result.Failure<User>(UserErrors.TooManyDiscussions);
-        }
-
-        if (ListUtility.HasDuplicates(discussions))
-        {
-            return Result.Failure<User>(UserErrors.DuplicateDiscussions);
-        }
-
-        if (roles.Count > discussions.Count)
-        {
-            return Result.Failure<User>(UserErrors.TooManyRoles);
-        }
-
-        if (ListUtility.HasDuplicates(roles))
-        {
-            return Result.Failure<User>(UserErrors.DuplicateRoles);
         }
 
         User user = new(Guid.NewGuid(), username, email, dateCreatedUtc, aboutSection, discussions, roles);
@@ -80,28 +54,107 @@ public sealed class User : Entity
         return Result.Success(user);
     }
 
-    public void UpdateAboutSection(string aboutSection)
+    public Result ChangeUsername(string username)
+    {
+        if (username.Length > 20)
+        {
+            return Result.Failure(UserErrors.UsernameTooLong);
+        }
+
+        Username = username;
+
+        return Result.Success();
+    }
+
+    public void ChangeEmail(Email email)
+    {
+        Email = email;
+    }
+
+    public void UpdateAboutSection(AboutSection aboutSection)
     {
         AboutSection = aboutSection;
     }
 
-    public void JoinDiscussion(Guid discussionId)
+    public Result JoinDiscussion(Guid discussionId)
     {
-        Discussions.Add(discussionId);
+        List<Guid> discussions = [.. Discussions.Value];
+
+        discussions.Add(discussionId);
+
+        Result<DiscussionsList> result = DiscussionsList.Create(discussions);
+
+        if (result.IsFailure)
+        {
+            return Result.Failure(result.Error);
+        }
+
+        Discussions = result.Value;
+
+        return Result.Success();
     }
 
-    public void LeaveDiscussion(Guid discussionId)
+    public Result LeaveDiscussion(Guid discussionId)
     {
-        Discussions.Remove(discussionId);
+        List<Guid> discussions = [.. Discussions.Value];
+
+        bool discussionRemoved = discussions.Remove(discussionId);
+
+        if (!discussionRemoved)
+        {
+            return Result.Failure(UserErrors.DiscussionNotFound);
+        }
+
+        Result<DiscussionsList> result = DiscussionsList.Create(discussions);
+
+        if (result.IsFailure)
+        {
+            return Result.Failure(result.Error);
+        }
+
+        Discussions = result.Value;
+
+        return Result.Success();
     }
 
-    public void AddRole(Guid roleId)
+    public Result AddRole(Guid roleId)
     {
-        Roles.Add(roleId);
+        List<Guid> roles = [.. Roles.Value];
+
+        roles.Add(roleId);
+
+        Result<RolesList> result = RolesList.Create(roles, Discussions);
+
+        if (result.IsFailure)
+        {
+            return Result.Failure(result.Error);
+        }
+
+        Roles = result.Value;
+
+        return Result.Success();
     }
 
-    public void RemoveRole(Guid roleId) 
+    public Result RemoveRole(Guid roleId) 
     {
-        Roles.Remove(roleId);
+        List<Guid> roles = [.. Roles.Value];
+
+        bool roleRemoved = roles.Remove(roleId);
+
+        if (!roleRemoved)
+        {
+            return Result.Failure(UserErrors.RoleNotFound);
+        }
+
+        Result<RolesList> result = RolesList.Create(roles, Discussions);
+
+        if (result.IsFailure)
+        {
+            return Result.Failure(result.Error);
+        }
+
+        Roles = result.Value;
+
+        return Result.Success();
     }
 }
