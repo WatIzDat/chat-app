@@ -78,9 +78,10 @@ public sealed class User : Entity
 
     public Result JoinDiscussion(Guid discussionId)
     {
-        List<Guid> discussions = [.. Discussions.Value];
-
-        discussions.Add(discussionId);
+        List<Guid> discussions = new(Discussions.Value)
+        {
+            discussionId
+        };
 
         Result<DiscussionsList> result = DiscussionsList.Create(discussions);
 
@@ -96,7 +97,7 @@ public sealed class User : Entity
 
     public Result LeaveDiscussion(Guid discussionId)
     {
-        List<Guid> discussions = [.. Discussions.Value];
+        List<Guid> discussions = new(Discussions.Value);
 
         bool discussionRemoved = discussions.Remove(discussionId);
 
@@ -119,9 +120,10 @@ public sealed class User : Entity
 
     public Result AddRole(Guid roleId)
     {
-        List<Guid> roles = [.. Roles.Value];
-
-        roles.Add(roleId);
+        List<Guid> roles = new(Roles.Value)
+        {
+            roleId
+        };
 
         Result<RolesList> result = RolesList.Create(roles, Discussions);
 
@@ -137,7 +139,7 @@ public sealed class User : Entity
 
     public Result RemoveRole(Guid roleId) 
     {
-        List<Guid> roles = [.. Roles.Value];
+        List<Guid> roles = new(Roles.Value);
 
         bool roleRemoved = roles.Remove(roleId);
 
