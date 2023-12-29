@@ -37,8 +37,15 @@ public sealed class Discussion : Entity
         return Result.Success(discussion);
     }
 
-    public void EditName(string name)
+    public Result EditName(string name)
     {
+        if (name.Length > 50)
+        {
+            return Result.Failure(DiscussionErrors.NameTooLong);
+        }
+
         Name = name;
+
+        return Result.Success();
     }
 }
