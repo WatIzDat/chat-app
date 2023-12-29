@@ -5,6 +5,8 @@ namespace Domain.Roles;
 
 public sealed class Role : Entity
 {
+    public const int NameMaxLength = 20;
+
     private Role(
         Guid id,
         Guid discussionId,
@@ -28,7 +30,7 @@ public sealed class Role : Entity
         string name,
         List<Permission> permissions)
     {
-        if (name.Length > 20)
+        if (name.Length > NameMaxLength)
         {
             return Result.Failure<Role>(RoleErrors.NameTooLong);
         }
@@ -45,7 +47,7 @@ public sealed class Role : Entity
 
     public Result EditName(string name)
     {
-        if (name.Length > 20)
+        if (name.Length > NameMaxLength)
         {
             return Result.Failure<Role>(RoleErrors.NameTooLong);
         }

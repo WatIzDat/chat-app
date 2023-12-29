@@ -6,6 +6,8 @@ namespace Domain.Users;
 
 public sealed class User : Entity
 {
+    public const int UsernameMaxLength = 20;
+
     private User(
         Guid id,
         string username,
@@ -44,7 +46,7 @@ public sealed class User : Entity
         DiscussionsList discussions,
         RolesList roles)
     {
-        if (username.Length > 20)
+        if (username.Length > UsernameMaxLength)
         {
             return Result.Failure<User>(UserErrors.UsernameTooLong);
         }
@@ -56,7 +58,7 @@ public sealed class User : Entity
 
     public Result ChangeUsername(string username)
     {
-        if (username.Length > 20)
+        if (username.Length > UsernameMaxLength)
         {
             return Result.Failure(UserErrors.UsernameTooLong);
         }

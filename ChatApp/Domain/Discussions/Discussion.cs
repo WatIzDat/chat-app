@@ -4,6 +4,8 @@ namespace Domain.Discussions;
 
 public sealed class Discussion : Entity
 {
+    public const int NameMaxLength = 50;
+
     private Discussion(
         Guid id,
         Guid userCreatedBy,
@@ -27,7 +29,7 @@ public sealed class Discussion : Entity
         string name,
         DateTimeOffset dateCreatedUtc)
     {
-        if (name.Length > 50)
+        if (name.Length > NameMaxLength)
         {
             return Result.Failure<Discussion>(DiscussionErrors.NameTooLong);
         }
@@ -39,7 +41,7 @@ public sealed class Discussion : Entity
 
     public Result EditName(string name)
     {
-        if (name.Length > 50)
+        if (name.Length > NameMaxLength)
         {
             return Result.Failure(DiscussionErrors.NameTooLong);
         }

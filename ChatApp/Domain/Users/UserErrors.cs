@@ -6,7 +6,7 @@ public static class UserErrors
 {
     public static readonly Error UsernameTooLong = new(
         "User.UsernameTooLong",
-        "The username cannot be longer than 20 characters.");
+        $"The username cannot be longer than {User.UsernameMaxLength} characters.");
 
     public static readonly Error DiscussionNotFound = new(
         "User.DiscussionNotFound",

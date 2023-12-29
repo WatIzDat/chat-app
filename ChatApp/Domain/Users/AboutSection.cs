@@ -4,6 +4,8 @@ namespace Domain.Users;
 
 public sealed class AboutSection
 {
+    public const int MaxLength = 200;
+
     private AboutSection(string value)
     {
         Value = value;
@@ -15,7 +17,7 @@ public sealed class AboutSection
     {
         value = value.ReplaceLineEndings("\r\n");
 
-        if (value.Length > 200)
+        if (value.Length > MaxLength)
         {
             return Result.Failure<AboutSection>(AboutSectionErrors.TooLong);
         }

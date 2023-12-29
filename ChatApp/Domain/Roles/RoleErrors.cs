@@ -6,7 +6,7 @@ public static class RoleErrors
 {
     public static readonly Error NameTooLong = new(
         "Role.NameTooLong",
-        "The name cannot be longer than 20 characters.");
+        $"The name cannot be longer than {Role.NameMaxLength} characters.");
 
     public static readonly Error DuplicatePermissions = new(
         "Role.DuplicatePermissions",
