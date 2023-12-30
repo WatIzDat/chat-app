@@ -15,4 +15,8 @@ public static class UserErrors
     public static readonly Error RoleNotFound = new(
         "User.RoleNotFound",
         "The requested role was not found in the user's roles.");
+
+    public static readonly Error EmailNotUnique = new(
+        "User.EmailNotUnique",
+        "A user with the requested email is already in the database.");
 }
