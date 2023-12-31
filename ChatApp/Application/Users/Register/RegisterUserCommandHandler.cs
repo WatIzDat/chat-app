@@ -1,5 +1,4 @@
-﻿using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
+﻿using Application.Abstractions.Messaging;
 using Domain.Users;
 using SharedKernel;
 
@@ -7,12 +6,10 @@ namespace Application.Users.Register;
 
 internal sealed class RegisterUserCommandHandler(
     IUserRepository userRepository,
-    IUnitOfWork unitOfWork,
     IDateTimeOffsetProvider dateTimeOffsetProvider)
     : ICommandHandler<RegisterUserCommand, Guid>
 {
     private readonly IUserRepository userRepository = userRepository;
-    private readonly IUnitOfWork unitOfWork = unitOfWork;
     private readonly IDateTimeOffsetProvider dateTimeOffsetProvider = dateTimeOffsetProvider;
 
     public async Task<Result<Guid>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -78,8 +75,6 @@ internal sealed class RegisterUserCommandHandler(
         User user = userResult.Value;
 
         userRepository.Insert(user);
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success(user.Id);
     }
