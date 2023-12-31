@@ -2,7 +2,7 @@
 using Domain.Users;
 using SharedKernel;
 
-namespace Application.Users.Register;
+namespace Application.Users.RegisterUser;
 
 internal sealed class RegisterUserCommandHandler(
     IUserRepository userRepository,
