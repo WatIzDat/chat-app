@@ -19,4 +19,8 @@ public static class UserErrors
     public static readonly Error EmailNotUnique = new(
         "User.EmailNotUnique",
         "A user with the requested email is already in the database.");
+
+    public static readonly Error NotFound = new(
+        "User.NotFound",
+        "The user with the requested ID was not found.");
 }
