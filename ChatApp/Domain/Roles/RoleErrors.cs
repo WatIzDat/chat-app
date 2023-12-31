@@ -11,4 +11,8 @@ public static class RoleErrors
     public static readonly Error DuplicatePermissions = new(
         "Role.DuplicatePermissions",
         "A role cannot have multiple of the same permission.");
+
+    public static readonly Error NotFound = new(
+        "Role.NotFound",
+        "The role with the requested ID was not found.");
 }

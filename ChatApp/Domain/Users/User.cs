@@ -28,7 +28,7 @@ public sealed class User : Entity
 
     public string Username { get; private set; }
 
-    public Email Email { get; private set; } 
+    public Email Email { get; private set; }
 
     public DateTimeOffset DateCreatedUtc { get; private set; }
 
@@ -139,7 +139,7 @@ public sealed class User : Entity
         return Result.Success();
     }
 
-    public Result RemoveRole(Guid roleId) 
+    public Result RemoveRole(Guid roleId)
     {
         List<Guid> roles = new(Roles.Value);
 
