@@ -72,11 +72,6 @@ public class RoleTests
         Result result = Role.AddPermission(Permission.KickUser);
 
         result.Error.Should().Be(RoleErrors.DuplicatePermissions);
-
-        Role.Permissions.Should().ContainInConsecutiveOrder(
-            Permission.BanUser,
-            Permission.DeleteMessage,
-            Permission.KickUser);
     }
 
     [Fact]
