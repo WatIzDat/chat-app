@@ -15,4 +15,8 @@ public static class RoleErrors
     public static readonly Error NotFound = new(
         "Role.NotFound",
         "The role with the requested ID was not found.");
+
+    public static readonly Error DuplicateRoleNamesInDiscussion = new(
+        "Role.DuplicateRoleNamesInDiscussion",
+        "A discussion cannot have multiple roles of the same name.");
 }
