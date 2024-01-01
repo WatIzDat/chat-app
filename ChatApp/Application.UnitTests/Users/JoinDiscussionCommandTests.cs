@@ -1,16 +1,17 @@
-using Application.Users.LeaveDiscussion;
+using Application.Users.JoinDiscussion;
+using Domain.Discussions;
 using Domain.Users;
 using NSubstitute.ReturnsExtensions;
 using SharedKernel;
 
 namespace Application.UnitTests.Users;
 
-public class LeaveDiscussionCommandTests
+public class JoinDiscussionCommandTests
 {
     private static readonly Guid DiscussionId = new("ac6338e8-cb43-499a-b8c3-511ac099362e");
 
     private static readonly DiscussionsList Discussions =
-        DiscussionsList.Create([DiscussionId]).Value;
+        DiscussionsList.Create([Guid.NewGuid()]).Value;
 
     private static readonly RolesList Roles =
         RolesList.Create([Guid.NewGuid()], Discussions).Value;
@@ -23,14 +24,16 @@ public class LeaveDiscussionCommandTests
             Discussions,
             Roles).Value;
 
-    private readonly LeaveDiscussionCommandHandler commandHandler;
+    private readonly JoinDiscussionCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
+    private readonly IDiscussionRepository discussionRepositoryMock;
 
-    public LeaveDiscussionCommandTests()
+    public JoinDiscussionCommandTests()
     {
         userRepositoryMock = Substitute.For<IUserRepository>();
+        discussionRepositoryMock = Substitute.For<IDiscussionRepository>();
 
-        commandHandler = new LeaveDiscussionCommandHandler(userRepositoryMock);
+        commandHandler = new JoinDiscussionCommandHandler(userRepositoryMock, discussionRepositoryMock);
     }
 
     [Fact]
@@ -44,15 +47,14 @@ public class LeaveDiscussionCommandTests
             User.Discussions,
             User.Roles).Value;
 
-        LeaveDiscussionCommand command = new(user.Id, DiscussionId);
-
+        JoinDiscussionCommand command = new(user.Id, DiscussionId);
+        
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(true);
 
         Result result = await commandHandler.Handle(command, default);
 
         result.IsSuccess.Should().BeTrue();
-
-        user.Discussions.Value.Should().NotContain(command.DiscussionId);
     }
 
     [Fact]
@@ -66,9 +68,10 @@ public class LeaveDiscussionCommandTests
             User.Discussions,
             User.Roles).Value;
 
-        LeaveDiscussionCommand command = new(user.Id, DiscussionId);
+        JoinDiscussionCommand command = new(user.Id, DiscussionId);
 
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
+        discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(true);
 
         Result result = await commandHandler.Handle(command, default);
 
@@ -76,7 +79,7 @@ public class LeaveDiscussionCommandTests
     }
 
     [Fact]
-    public async Task Handle_Should_ReturnDiscussionNotFound_WhenGuidIsNotInDiscussionsList()
+    public async Task Handle_Should_ReturnDiscussionNotFound_WhenDiscussionExistsAsyncReturnsFalse()
     {
         User user = User.Create(
             User.Username,
@@ -86,17 +89,35 @@ public class LeaveDiscussionCommandTests
             User.Discussions,
             User.Roles).Value;
 
-        LeaveDiscussionCommand command = new(user.Id, DiscussionId);
+        JoinDiscussionCommand command = new(user.Id, DiscussionId);
 
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(false);
 
-        LeaveDiscussionCommand discussionNotFoundCommand = new(
-            command.UserId,
-            Guid.NewGuid());
+        Result result = await commandHandler.Handle(command, default);
 
-        Result result = await commandHandler.Handle(discussionNotFoundCommand, default);
+        result.Error.Should().Be(DiscussionErrors.NotFound);
+    }
 
-        result.Error.Should().Be(UserErrors.DiscussionNotFound);
+    [Fact]
+    public async Task Handle_Should_ReturnDuplicateDiscussions_WhenDuplicateGuidIsAdded()
+    {
+        User user = User.Create(
+            User.Username,
+            User.Email,
+            User.DateCreatedUtc,
+            User.AboutSection,
+            User.Discussions,
+            User.Roles).Value;
+
+        JoinDiscussionCommand command = new(user.Id, user.Discussions.Value[0]);
+
+        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(true);
+
+        Result result = await commandHandler.Handle(command, default);
+
+        result.Error.Should().Be(DiscussionsListErrors.DuplicateDiscussions);
     }
 
     [Fact]
@@ -110,9 +131,10 @@ public class LeaveDiscussionCommandTests
             User.Discussions,
             User.Roles).Value;
 
-        LeaveDiscussionCommand command = new(user.Id, DiscussionId);
+        JoinDiscussionCommand command = new(user.Id, DiscussionId);
 
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(true);
 
         Result result = await commandHandler.Handle(command, default);
 
