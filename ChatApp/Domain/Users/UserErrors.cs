@@ -16,6 +16,10 @@ public static class UserErrors
         "User.RoleNotFound",
         "The requested role was not found in the user's roles.");
 
+    public static readonly Error RoleNotInDiscussionsList = new(
+        "User.RoleNotInDiscussionsList",
+        "The requested role does not apply to any of the user's joined discussions.");
+
     public static readonly Error EmailNotUnique = new(
         "User.EmailNotUnique",
         "A user with the requested email is already in the database.");

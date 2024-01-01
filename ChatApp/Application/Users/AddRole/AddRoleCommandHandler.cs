@@ -27,6 +27,11 @@ internal sealed class AddRoleCommandHandler(
             return Result.Failure(RoleErrors.NotFound);
         }
 
+        if (!await roleRepository.RoleInDiscussionsListAsync(request.RoleId, user.Discussions, cancellationToken))
+        {
+            return Result.Failure(UserErrors.RoleNotInDiscussionsList);
+        }
+
         Result result = user.AddRole(request.RoleId);
 
         if (result.IsFailure)

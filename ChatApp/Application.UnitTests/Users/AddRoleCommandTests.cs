@@ -51,6 +51,7 @@ public class AddRoleCommandTests
         
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
         roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
+        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
 
         Result result = await commandHandler.Handle(command, default);
 
@@ -72,6 +73,7 @@ public class AddRoleCommandTests
 
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
         roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
+        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
 
         Result result = await commandHandler.Handle(command, default);
 
@@ -93,10 +95,33 @@ public class AddRoleCommandTests
 
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
         roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(false);
+        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
 
         Result result = await commandHandler.Handle(command, default);
 
         result.Error.Should().Be(RoleErrors.NotFound);
+    }
+
+    [Fact]
+    public async Task Handle_Should_ReturnRoleNotInDiscussionsList_WhenRoleInDiscussionsListAsyncReturnsFalse()
+    {
+        User user = User.Create(
+            User.Username,
+            User.Email,
+            User.DateCreatedUtc,
+            User.AboutSection,
+            User.Discussions,
+            User.Roles).Value;
+
+        AddRoleCommand command = new(user.Id, RoleId);
+
+        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
+        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(false);
+
+        Result result = await commandHandler.Handle(command, default);
+
+        result.Error.Should().Be(UserErrors.RoleNotInDiscussionsList);
     }
 
     [Fact]
@@ -114,6 +139,7 @@ public class AddRoleCommandTests
 
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
         roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
+        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
 
         Result result = await commandHandler.Handle(command, default);
 
@@ -135,6 +161,7 @@ public class AddRoleCommandTests
 
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
         roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
+        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
 
         Result result = await commandHandler.Handle(command, default);
 
