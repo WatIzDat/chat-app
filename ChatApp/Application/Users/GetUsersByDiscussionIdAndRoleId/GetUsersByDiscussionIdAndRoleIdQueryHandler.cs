@@ -1,5 +1,6 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Domain.Roles;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -12,6 +13,20 @@ internal sealed class GetUsersByDiscussionIdAndRoleIdQueryHandler(IApplicationDb
 
     public async Task<Result<List<UserResponse>>> Handle(GetUsersByDiscussionIdAndRoleIdQuery request, CancellationToken cancellationToken)
     {
+        Role? role = await dbContext.Roles
+            .Where(r => r.Id == request.RoleId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (role == null)
+        {
+            return Result.Failure<List<UserResponse>>(RoleErrors.NotFound);
+        }
+
+        if (role.DiscussionId != request.DiscussionId)
+        {
+            return Result.Failure<List<UserResponse>>(RoleErrors.NotInDiscussion);
+        }
+
         List<UserResponse> users = await dbContext.Users
             .Where(u => u.Discussions.Value.Contains(request.DiscussionId) && u.Roles.Value.Contains(request.RoleId))
             .Select(u => new UserResponse

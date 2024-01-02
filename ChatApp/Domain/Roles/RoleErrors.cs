@@ -23,4 +23,8 @@ public static class RoleErrors
     public static readonly Error PermissionNotFound = new(
         "Role.PermissionNotFound",
         "The requested permission was not found in the role's list of permissions.");
+
+    public static readonly Error NotInDiscussion = new(
+        "Role.NotInDiscussion",
+        "The requested role does not apply to the specified discussion.");
 }
