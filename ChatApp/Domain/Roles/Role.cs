@@ -74,8 +74,15 @@ public sealed class Role : Entity
         return Result.Success();
     }
 
-    public void RemovePermission(Permission permission)
+    public Result RemovePermission(Permission permission)
     {
-        Permissions.Remove(permission);
+        bool permissionRemoved = Permissions.Remove(permission);
+
+        if (!permissionRemoved)
+        {
+            return Result.Failure(RoleErrors.PermissionNotFound);
+        }
+
+        return Result.Success();
     }
 }

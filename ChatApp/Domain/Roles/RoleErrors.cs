@@ -19,4 +19,8 @@ public static class RoleErrors
     public static readonly Error DuplicateRoleNamesInDiscussion = new(
         "Role.DuplicateRoleNamesInDiscussion",
         "A discussion cannot have multiple roles of the same name.");
+
+    public static readonly Error PermissionNotFound = new(
+        "Role.PermissionNotFound",
+        "The requested permission was not found in the role's list of permissions.");
 }
