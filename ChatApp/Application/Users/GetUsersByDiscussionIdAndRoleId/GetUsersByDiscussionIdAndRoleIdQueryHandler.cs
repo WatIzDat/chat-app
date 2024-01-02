@@ -22,6 +22,12 @@ internal sealed class GetUsersByDiscussionIdAndRoleIdQueryHandler(IApplicationDb
                 DateCreatedUtc = u.IsDeleted ? DateTimeOffset.MinValue : u.DateCreatedUtc,
                 AboutSection = u.IsDeleted ? "" : u.AboutSection.Value
             })
+            // Pagination
+            .OrderBy(u => u.DateCreatedUtc)
+            .ThenBy(u => u.Id)
+            .Where(u => u.DateCreatedUtc > request.LastDateCreatedUtc
+                    || (u.DateCreatedUtc == request.LastDateCreatedUtc && u.Id > request.LastUserId))
+            .Take(request.Limit)
             .ToListAsync(cancellationToken);
 
         return Result.Success(users);
