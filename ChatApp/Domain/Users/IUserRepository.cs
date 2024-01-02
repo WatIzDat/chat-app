@@ -6,8 +6,6 @@ public interface IUserRepository
 
     void Update(User user);
 
-    void Delete(User user);
-
     Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<bool> IsEmailUniqueAsync(Email email, CancellationToken cancellationToken = default);

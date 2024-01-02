@@ -15,7 +15,8 @@ public sealed class User : Entity
         DateTimeOffset dateCreatedUtc,
         AboutSection aboutSection,
         DiscussionsList discussions,
-        RolesList roles)
+        RolesList roles,
+        bool isDeleted)
         : base(id)
     {
         Username = username;
@@ -24,6 +25,7 @@ public sealed class User : Entity
         AboutSection = aboutSection;
         Discussions = discussions;
         Roles = roles;
+        IsDeleted = isDeleted;
     }
 
     public string Username { get; private set; }
@@ -38,6 +40,8 @@ public sealed class User : Entity
 
     public RolesList Roles { get; private set; }
 
+    public bool IsDeleted { get; private set; }
+
     public static Result<User> Create(
         string username,
         Email email,
@@ -51,7 +55,7 @@ public sealed class User : Entity
             return Result.Failure<User>(UserErrors.UsernameTooLong);
         }
 
-        User user = new(Guid.NewGuid(), username, email, dateCreatedUtc, aboutSection, discussions, roles);
+        User user = new(Guid.NewGuid(), username, email, dateCreatedUtc, aboutSection, discussions, roles, isDeleted: false);
 
         return Result.Success(user);
     }
@@ -160,5 +164,10 @@ public sealed class User : Entity
         Roles = result.Value;
 
         return Result.Success();
+    }
+
+    public void Delete()
+    {
+        IsDeleted = true;
     }
 }
