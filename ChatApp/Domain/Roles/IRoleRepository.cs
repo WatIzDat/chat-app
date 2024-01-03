@@ -8,6 +8,8 @@ public interface IRoleRepository
 
     void Update(Role role);
 
+    void Delete(Role role);
+
     Task<Role?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<bool> RoleExistsAsync(Guid id, CancellationToken cancellationToken = default);
