@@ -43,13 +43,14 @@ public class MessageTests
     }
 
     [Fact]
-    public void EditContents_Should_ReturnSuccess_And_ChangeContents()
+    public void EditContents_Should_ReturnSuccess_And_ChangeContents_And_SetIsEditedToTrue()
     {
         Result result = Message.EditContents("hello");
 
         result.IsSuccess.Should().BeTrue();
 
         Message.Contents.Should().Be("hello");
+        Message.IsEdited.Should().Be(true);
     }
 
     [Fact]

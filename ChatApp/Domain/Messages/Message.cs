@@ -11,13 +11,15 @@ public sealed class Message : Entity
         Guid userId,
         Guid discussionId,
         string contents,
-        DateTimeOffset dateSentUtc)
+        DateTimeOffset dateSentUtc,
+        bool isEdited)
         : base(id)
     {
         UserId = userId;
         DiscussionId = discussionId;
         Contents = contents;
         DateSentUtc = dateSentUtc;
+        IsEdited = isEdited;
     }
 
     public Guid UserId { get; private set; }
@@ -27,6 +29,8 @@ public sealed class Message : Entity
     public string Contents { get; private set; }
 
     public DateTimeOffset DateSentUtc { get; private set; }
+
+    public bool IsEdited { get; private set; }
 
     public static Result<Message> Create(
         Guid userId,
@@ -39,7 +43,7 @@ public sealed class Message : Entity
             return Result.Failure<Message>(MessageErrors.ContentsTooLong);
         }
 
-        Message message = new(Guid.NewGuid(), userId, discussionId, contents, dateSentUtc);
+        Message message = new(Guid.NewGuid(), userId, discussionId, contents, dateSentUtc, isEdited: false);
 
         return Result.Success(message);
     }
@@ -52,6 +56,8 @@ public sealed class Message : Entity
         }
 
         Contents = contents;
+
+        IsEdited = true;
 
         return Result.Success();
     }
