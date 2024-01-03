@@ -2,13 +2,13 @@ namespace Application.Users;
 
 public sealed record UserResponse
 {
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
-    public string Username { get; init; } = string.Empty;
+    public required string Username { get; init; }
 
-    public string Email { get; init; } = string.Empty;
+    public required string Email { get; init; }
 
-    public DateTimeOffset DateCreatedUtc { get; init; }
+    public required DateTimeOffset DateCreatedUtc { get; init; }
 
-    public string AboutSection { get; init; } = string.Empty;
+    public required string AboutSection { get; init; }
 }
