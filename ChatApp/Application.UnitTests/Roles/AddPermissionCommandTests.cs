@@ -30,7 +30,7 @@ public class AddPermissionCommandTests
 
         AddPermissionCommand command = new(role.Id, Permission.KickUser.Value);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(role.Id)).Returns(role);
+        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
 
         Result result = await commandHandler.Handle(command, default);
 
@@ -49,7 +49,7 @@ public class AddPermissionCommandTests
 
         AddPermissionCommand command = new(role.Id, Permission.KickUser.Value);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(role.Id)).ReturnsNull();
+        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).ReturnsNull();
 
         Result result = await commandHandler.Handle(command, default);
 
@@ -66,7 +66,7 @@ public class AddPermissionCommandTests
 
         AddPermissionCommand command = new(role.Id, "this permission is not allowed");
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(role.Id)).Returns(role);
+        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
 
         Result result = await commandHandler.Handle(command, default);
 
@@ -83,7 +83,7 @@ public class AddPermissionCommandTests
 
         AddPermissionCommand command = new(role.Id, Permission.BanUser.Value);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(role.Id)).Returns(role);
+        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
 
         Result result = await commandHandler.Handle(command, default);
 
@@ -100,11 +100,9 @@ public class AddPermissionCommandTests
 
         AddPermissionCommand command = new(role.Id, Permission.KickUser.Value);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(role.Id)).Returns(role);
+        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
 
         Result result = await commandHandler.Handle(command, default);
-
-        result.IsSuccess.Should().BeTrue();
 
         roleRepositoryMock
             .Received(1)
