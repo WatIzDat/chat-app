@@ -1,17 +1,34 @@
 using Application.Abstractions.Messaging;
+using Domain.Discussions;
 using Domain.Messages;
+using Domain.Users;
 using SharedKernel;
 
 namespace Application.Messages.SendMessage;
 
 internal sealed class SendMessageCommandHandler(
     IMessageRepository messageRepository,
+    IUserRepository userRepository,
+    IDiscussionRepository discussionRepository,
     IDateTimeOffsetProvider dateTimeOffsetProvider)
     : ICommandHandler<SendMessageCommand, Guid>
 {
-    public Task<Result<Guid>> Handle(SendMessageCommand request, CancellationToken cancellationToken)
+    private readonly IMessageRepository messageRepository = messageRepository;
+    private readonly IUserRepository userRepository = userRepository;
+    private readonly IDiscussionRepository discussionRepository = discussionRepository;
+    private readonly IDateTimeOffsetProvider dateTimeOffsetProvider = dateTimeOffsetProvider;
+
+    public async Task<Result<Guid>> Handle(SendMessageCommand request, CancellationToken cancellationToken)
     {
-        // TODO: Add check for user and discussion exists
+        if (!await userRepository.UserExistsAsync(request.UserId, cancellationToken))
+        {
+            return Result.Failure<Guid>(UserErrors.NotFound);
+        }
+
+        if (!await discussionRepository.DiscussionExistsAsync(request.DiscussionId, cancellationToken))
+        {
+            return Result.Failure<Guid>(DiscussionErrors.NotFound);
+        }
         
         Result<Message> messageResult = Message.Create(
             request.UserId,
@@ -21,14 +38,13 @@ internal sealed class SendMessageCommandHandler(
 
         if (messageResult.IsFailure)
         {
-            return Task.FromResult(Result.Failure<Guid>(messageResult.Error));
+            return Result.Failure<Guid>(messageResult.Error);
         }
 
         Message message = messageResult.Value;
 
         messageRepository.Insert(message);
 
-        return Task.FromResult(Result.Success(message.Id));
+        return Result.Success(message.Id);
     }
 }
-

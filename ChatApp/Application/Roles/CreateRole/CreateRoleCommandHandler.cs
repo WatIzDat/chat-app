@@ -1,16 +1,24 @@
 using Application.Abstractions.Messaging;
+using Domain.Discussions;
 using Domain.Roles;
 using SharedKernel;
 
 namespace Application.Roles.CreateRole;
 
-internal sealed class CreateRoleCommandHandler(IRoleRepository roleRepository) : ICommandHandler<CreateRoleCommand, Guid>
+internal sealed class CreateRoleCommandHandler(
+    IRoleRepository roleRepository,
+    IDiscussionRepository discussionRepository)
+    : ICommandHandler<CreateRoleCommand, Guid>
 {
     private readonly IRoleRepository roleRepository = roleRepository;
+    private readonly IDiscussionRepository discussionRepository = discussionRepository;
 
     public async Task<Result<Guid>> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
     {
-        // TODO: Add check for discussion exists
+        if (!await discussionRepository.DiscussionExistsAsync(request.DiscussionId, cancellationToken))
+        {
+            return Result.Failure<Guid>(DiscussionErrors.NotFound);
+        }
 
         if (await roleRepository.DuplicateRoleNamesInDiscussionAsync(request.Name, request.DiscussionId, cancellationToken))
         {
