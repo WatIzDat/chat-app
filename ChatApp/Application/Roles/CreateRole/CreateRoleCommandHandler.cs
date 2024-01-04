@@ -10,6 +10,8 @@ internal sealed class CreateRoleCommandHandler(IRoleRepository roleRepository) :
 
     public async Task<Result<Guid>> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
     {
+        // TODO: Add check for discussion exists
+
         if (await roleRepository.DuplicateRoleNamesInDiscussionAsync(request.Name, request.DiscussionId, cancellationToken))
         {
             return Result.Failure<Guid>(RoleErrors.DuplicateRoleNamesInDiscussion);
