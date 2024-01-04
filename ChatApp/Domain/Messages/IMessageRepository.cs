@@ -6,5 +6,7 @@ public interface IMessageRepository
 
     void Update(Message message);
 
+    void Delete(Message message);
+
     Task<Message?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }
