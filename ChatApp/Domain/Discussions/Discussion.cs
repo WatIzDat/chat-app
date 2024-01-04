@@ -10,12 +10,14 @@ public sealed class Discussion : Entity
         Guid id,
         Guid userCreatedBy,
         string name,
-        DateTimeOffset dateCreatedUtc)
+        DateTimeOffset dateCreatedUtc,
+        bool isDeleted)
         : base(id)
     {
         UserCreatedBy = userCreatedBy;
         Name = name;
         DateCreatedUtc = dateCreatedUtc;
+        IsDeleted = isDeleted;
     }
 
     public Guid UserCreatedBy { get; private set; }
@@ -23,6 +25,8 @@ public sealed class Discussion : Entity
     public string Name { get; private set; }
 
     public DateTimeOffset DateCreatedUtc { get; private set; }
+
+    public bool IsDeleted { get; private set; }
 
     public static Result<Discussion> Create(
         Guid userCreatedBy,
@@ -34,7 +38,7 @@ public sealed class Discussion : Entity
             return Result.Failure<Discussion>(DiscussionErrors.NameTooLong);
         }
 
-        Discussion discussion = new(Guid.NewGuid(), userCreatedBy, name, dateCreatedUtc);
+        Discussion discussion = new(Guid.NewGuid(), userCreatedBy, name, dateCreatedUtc, isDeleted: false);
 
         return Result.Success(discussion);
     }
@@ -49,5 +53,10 @@ public sealed class Discussion : Entity
         Name = name;
 
         return Result.Success();
+    }
+
+    public void Delete()
+    {
+        IsDeleted = true;
     }
 }
