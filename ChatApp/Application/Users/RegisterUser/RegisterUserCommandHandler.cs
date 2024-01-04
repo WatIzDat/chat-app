@@ -59,6 +59,8 @@ internal sealed class RegisterUserCommandHandler(
         RolesList roles = rolesResult.Value;
 
 
+        // TODO: Check username is unique
+
         Result<User> userResult = User.Create(
             request.Username,
             email,
