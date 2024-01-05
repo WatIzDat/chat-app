@@ -1,4 +1,6 @@
-﻿namespace Domain.Bans;
+﻿using SharedKernel;
+
+namespace Domain.Bans;
 
 public sealed record BanDetails
 {
@@ -14,11 +16,16 @@ public sealed record BanDetails
 
     public DateTimeOffset? DateOfUnbanUtc { get; }
 
-    public static BanDetails CreateTemporaryBan(DateTimeOffset dateOfUnbanUtc)
+    public static Result<BanDetails> CreateTemporaryBan(DateTimeOffset currentTime, DateTimeOffset dateOfUnbanUtc)
     {
+        if (currentTime < dateOfUnbanUtc)
+        {
+            return Result.Failure<BanDetails>(BanErrors.CurrentTimeEarlierThanDateOfUnban);
+        }
+
         BanDetails banDetails = new(isBanPermanent: false, dateOfUnbanUtc);
 
-        return banDetails;
+        return Result.Success(banDetails);
     }
 
     public static BanDetails CreatePermanentBan()
