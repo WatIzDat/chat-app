@@ -1,6 +1,4 @@
-﻿using Domain.Discussions;
-using SharedKernel;
-using SharedKernel.Utility;
+﻿using SharedKernel;
 
 namespace Domain.Users;
 
