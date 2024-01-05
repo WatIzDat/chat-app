@@ -17,6 +17,8 @@ internal sealed class CreateDiscussionCommandHandler(
 
     public async Task<Result<Guid>> Handle(CreateDiscussionCommand request, CancellationToken cancellationToken)
     {
+        // TODO: Add limit to amount of discussions a single user can create
+
         if (!await userRepository.UserExistsAsync(request.UserId))
         {
             return Result.Failure<Guid>(UserErrors.NotFound);
