@@ -18,7 +18,7 @@ public sealed record BanDetails
 
     public static Result<BanDetails> CreateTemporaryBan(DateTimeOffset currentTime, DateTimeOffset dateOfUnbanUtc)
     {
-        if (currentTime < dateOfUnbanUtc)
+        if (currentTime > dateOfUnbanUtc)
         {
             return Result.Failure<BanDetails>(BanErrors.CurrentTimeEarlierThanDateOfUnban);
         }

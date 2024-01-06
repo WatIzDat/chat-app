@@ -28,7 +28,7 @@ public class BanTests
             Guid.NewGuid(),
             Guid.NewGuid(),
             DateTimeOffset.UtcNow,
-            BanDetails.CreateTemporaryBan(DateTimeOffset.UtcNow.AddDays(1)));
+            BanDetails.CreateTemporaryBan(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddDays(1)).Value);
 
         Result result = ban.UnbanUser(DateTimeOffset.UtcNow);
 

@@ -9,10 +9,10 @@ public class BanDetailsTests
     {
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        BanDetails banDetails = BanDetails.CreateTemporaryBan(utcNow);
+        BanDetails banDetails = BanDetails.CreateTemporaryBan(utcNow, utcNow.AddDays(1)).Value;
 
         banDetails.IsBanPermanent.Should().BeFalse();
-        banDetails.DateOfUnbanUtc.Should().Be(utcNow);
+        banDetails.DateOfUnbanUtc.Should().Be(utcNow.AddDays(1));
     }
 
     [Fact]
