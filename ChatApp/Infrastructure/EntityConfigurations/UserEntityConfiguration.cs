@@ -63,5 +63,10 @@ internal class UserEntityConfiguration : IEntityTypeConfiguration<User>
             .HasIndex(u => u.Username)
             .IsUnique()
             .HasFilter("is_deleted = FALSE");
+
+        builder
+            .HasIndex(u => u.Email)
+            .IsUnique()
+            .HasFilter("is_deleted = FALSE");
     }
 }
