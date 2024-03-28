@@ -25,8 +25,14 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<User> Users { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseNpgsql();
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -43,7 +49,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         List<IDomainEvent> domainEvents = ChangeTracker
             .Entries<Entity>()
             .Select(e => e.Entity)
-            .SelectMany(e => 
+            .SelectMany(e =>
             {
                 List<IDomainEvent> domainEvents = e.DomainEvents;
 
