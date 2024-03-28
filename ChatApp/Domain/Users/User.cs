@@ -1,4 +1,6 @@
-﻿using SharedKernel;
+﻿using System.Collections.ObjectModel;
+using Domain.Discussions;
+using SharedKernel;
 
 namespace Domain.Users;
 
@@ -39,6 +41,8 @@ public sealed class User : Entity
     public RolesList Roles { get; private set; }
 
     public bool IsDeleted { get; private set; }
+
+    public ReadOnlyCollection<Discussion> DiscussionsNavigation { get; set; } = null!;
 
     public static Result<User> Create(
         string username,
@@ -129,7 +133,12 @@ public sealed class User : Entity
             roleId
         };
 
-        Result<RolesList> result = RolesList.Create(roles, Discussions);
+        if (roles.Count > Discussions.Value.Count)
+        {
+            return Result.Failure(RolesListErrors.TooManyRoles);
+        }
+
+        Result<RolesList> result = RolesList.Create(roles);
 
         if (result.IsFailure)
         {
@@ -152,7 +161,7 @@ public sealed class User : Entity
             return Result.Failure(UserErrors.RoleNotFound);
         }
 
-        Result<RolesList> result = RolesList.Create(roles, Discussions);
+        Result<RolesList> result = RolesList.Create(roles);
 
         if (result.IsFailure)
         {

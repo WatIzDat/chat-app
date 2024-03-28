@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace Domain.Users;
 
-public sealed class DiscussionsList
+public sealed record DiscussionsList
 {
     public const int MaxLength = 100;
 

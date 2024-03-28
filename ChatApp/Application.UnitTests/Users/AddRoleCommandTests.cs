@@ -14,7 +14,7 @@ public class AddRoleCommandTests
         DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
 
     private static readonly RolesList Roles =
-        RolesList.Create([Guid.NewGuid()], Discussions).Value;
+        RolesList.Create([Guid.NewGuid()]).Value;
 
     private static readonly User User = User.Create(
             "test123",
@@ -144,6 +144,28 @@ public class AddRoleCommandTests
         Result result = await commandHandler.Handle(command, default);
 
         result.Error.Should().Be(RolesListErrors.DuplicateRoles);
+    }
+
+    [Fact]
+    public async Task Handle_Should_ReturnTooManyRoles_WhenListIsLongerThanDiscussionsList()
+    {
+        User user = User.Create(
+            User.Username,
+            User.Email,
+            User.DateCreatedUtc,
+            User.AboutSection,
+            User.Discussions,
+            RolesList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value).Value;
+
+        AddRoleCommand command = new(user.Id, RoleId);
+
+        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
+        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
+
+        Result result = await commandHandler.Handle(command, default);
+
+        result.Error.Should().Be(RolesListErrors.TooManyRoles);
     }
 
     [Fact]

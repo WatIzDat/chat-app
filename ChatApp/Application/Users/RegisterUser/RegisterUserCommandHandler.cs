@@ -49,7 +49,7 @@ internal sealed class RegisterUserCommandHandler(
         DiscussionsList discussions = discussionsResult.Value;
 
 
-        Result<RolesList> rolesResult = RolesList.Create([], discussions);
+        Result<RolesList> rolesResult = RolesList.Create([]);
 
         if (rolesResult.IsFailure)
         {

@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace Domain.Users;
 
-public sealed class RolesList
+public sealed record RolesList
 {
     private RolesList(List<Guid> value)
     {
@@ -13,10 +13,9 @@ public sealed class RolesList
 
     public ReadOnlyCollection<Guid> Value { get; }
 
-    // Uses discussion list to ensure valid state
-    public static Result<RolesList> Create(List<Guid> value, DiscussionsList discussions)
+    public static Result<RolesList> Create(List<Guid> value)
     {
-        Result result = Validate(value, discussions);
+        Result result = Validate(value);
 
         if (result.IsFailure)
         {
@@ -26,13 +25,8 @@ public sealed class RolesList
         return Result.Success(new RolesList(value));
     }
 
-    private static Result Validate(List<Guid> value, DiscussionsList discussions)
+    private static Result Validate(List<Guid> value)
     {
-        if (value.Count > discussions.Value.Count)
-        {
-            return Result.Failure(RolesListErrors.TooManyRoles);
-        }
-
         if (ListUtility.HasDuplicates(value))
         {
             return Result.Failure(RolesListErrors.DuplicateRoles);

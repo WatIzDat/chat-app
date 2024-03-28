@@ -10,7 +10,7 @@ public class UserTests
         DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
 
     private static readonly RolesList Roles =
-        RolesList.Create([Guid.NewGuid(), Guid.NewGuid()], Discussions).Value;
+        RolesList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
 
     private static readonly User User = User.Create(
             "test123",

@@ -13,7 +13,7 @@ public class LeaveDiscussionCommandTests
         DiscussionsList.Create([DiscussionId]).Value;
 
     private static readonly RolesList Roles =
-        RolesList.Create([Guid.NewGuid()], Discussions).Value;
+        RolesList.Create([Guid.NewGuid()]).Value;
 
     private static readonly User User = User.Create(
             "test123",

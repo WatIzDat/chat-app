@@ -13,24 +13,10 @@ public class RolesListTests
         DiscussionsList discussions = DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
 
         // Act
-        Result<RolesList> result = RolesList.Create(roles, discussions);
+        Result<RolesList> result = RolesList.Create(roles);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-    }
-
-    [Fact]
-    public void Create_Should_ReturnTooManyRoles_WhenListIsLongerThanDiscussionsList()
-    {
-        // Arrange
-        List<Guid> roles = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
-        DiscussionsList discussions = DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
-
-        // Act
-        Result<RolesList> result = RolesList.Create(roles, discussions);
-
-        // Assert
-        result.Error.Should().Be(RolesListErrors.TooManyRoles);
     }
 
     [Fact]
@@ -43,7 +29,7 @@ public class RolesListTests
         DiscussionsList discussions = DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
 
         // Act
-        Result<RolesList> result = RolesList.Create(roles, discussions);
+        Result<RolesList> result = RolesList.Create(roles);
 
         // Assert
         result.Error.Should().Be(RolesListErrors.DuplicateRoles);

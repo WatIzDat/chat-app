@@ -13,7 +13,7 @@ public class RemoveRoleCommandTests
         DiscussionsList.Create([Guid.NewGuid()]).Value;
 
     private static readonly RolesList Roles =
-        RolesList.Create([RoleId], Discussions).Value;
+        RolesList.Create([RoleId]).Value;
 
     private static readonly User User = User.Create(
             "test123",
