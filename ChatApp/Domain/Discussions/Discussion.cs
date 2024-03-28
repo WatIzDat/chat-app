@@ -1,4 +1,5 @@
-﻿using SharedKernel;
+﻿using Domain.Roles;
+using SharedKernel;
 
 namespace Domain.Discussions;
 
@@ -27,6 +28,9 @@ public sealed class Discussion : Entity
     public DateTimeOffset DateCreatedUtc { get; private set; }
 
     public bool IsDeleted { get; private set; }
+
+    // Shadow property for EF
+    public ICollection<Role> Roles { get; set; } = null!;
 
     public static Result<Discussion> Create(
         Guid userCreatedBy,

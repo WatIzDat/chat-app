@@ -1,4 +1,5 @@
-﻿using SharedKernel;
+﻿using Domain.Discussions;
+using SharedKernel;
 using SharedKernel.Utility;
 
 namespace Domain.Roles;
@@ -24,6 +25,9 @@ public sealed class Role : Entity
     public string Name { get; private set; }
 
     public List<Permission> Permissions { get; private set; }
+
+    // Shadow property for EF
+    public Discussion Discussion { get; set; } = null!;
 
     public static Result<Role> Create(
         Guid discussionId,
