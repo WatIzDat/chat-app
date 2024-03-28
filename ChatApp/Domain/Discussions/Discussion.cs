@@ -1,5 +1,6 @@
 ﻿using Domain.Messages;
 using Domain.Roles;
+using Domain.Users;
 using SharedKernel;
 
 namespace Domain.Discussions;
@@ -35,6 +36,9 @@ public sealed class Discussion : Entity
 
     // Shadow property for EF
     public ICollection<Message> Messages { get; set; } = null!;
+
+    // Shadow property for EF
+    public User User { get; set; } = null!;
 
     public static Result<Discussion> Create(
         Guid userCreatedBy,
