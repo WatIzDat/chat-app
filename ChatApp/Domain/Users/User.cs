@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Domain.Discussions;
+using Domain.Messages;
 using SharedKernel;
 
 namespace Domain.Users;
@@ -42,7 +43,11 @@ public sealed class User : Entity
 
     public bool IsDeleted { get; private set; }
 
+    // Navigation property for EF
     public ReadOnlyCollection<Discussion> DiscussionsNavigation { get; set; } = null!;
+
+    // Shadow property for EF
+    public ICollection<Message> Messages { get; set; } = null!;
 
     public static Result<User> Create(
         string username,

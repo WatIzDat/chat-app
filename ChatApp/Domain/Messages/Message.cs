@@ -1,4 +1,6 @@
-﻿using SharedKernel;
+﻿using Domain.Discussions;
+using Domain.Users;
+using SharedKernel;
 
 namespace Domain.Messages;
 
@@ -31,6 +33,12 @@ public sealed class Message : Entity
     public DateTimeOffset DateSentUtc { get; private set; }
 
     public bool IsEdited { get; private set; }
+
+    // Shadow property for EF
+    public User User { get; set; } = null!;
+
+    // Shadow property for EF
+    public Discussion Discussion { get; set; } = null!;
 
     public static Result<Message> Create(
         Guid userId,
