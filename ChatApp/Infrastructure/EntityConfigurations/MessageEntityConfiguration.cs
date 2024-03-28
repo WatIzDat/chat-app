@@ -38,13 +38,13 @@ internal class MessageEntityConfiguration : IEntityTypeConfiguration<Message>
             .HasColumnName("is_edited");
 
         builder
-            .HasOne(m => m.User)
-            .WithMany(u => u.Messages)
+            .HasOne(m => m.UserNavigation)
+            .WithMany(u => u.MessagesNavigation)
             .HasForeignKey(m => m.UserId);
 
         builder
-            .HasOne(m => m.Discussion)
-            .WithMany(d => d.Messages)
+            .HasOne(m => m.DiscussionNavigation)
+            .WithMany(d => d.MessagesNavigation)
             .HasForeignKey(m => m.DiscussionId);
     }
 }

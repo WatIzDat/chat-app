@@ -32,8 +32,8 @@ internal class RoleEntityConfiguration : IEntityTypeConfiguration<Role>
                 value => value.Select(v => Permission.Create(v).Value).ToList());
 
         builder
-            .HasOne(r => r.Discussion)
-            .WithMany(d => d.Roles)
+            .HasOne(r => r.DiscussionNavigation)
+            .WithMany(d => d.RolesNavigation)
             .HasForeignKey(r => r.DiscussionId);
     }
 }

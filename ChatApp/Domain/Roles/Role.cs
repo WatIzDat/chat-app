@@ -26,8 +26,8 @@ public sealed class Role : Entity
 
     public List<Permission> Permissions { get; private set; }
 
-    // Shadow property for EF
-    public Discussion Discussion { get; set; } = null!;
+    // Navigation property for EF
+    public Discussion DiscussionNavigation { get; set; } = null!;
 
     public static Result<Role> Create(
         Guid discussionId,

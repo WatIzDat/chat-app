@@ -31,14 +31,14 @@ public sealed class Discussion : Entity
 
     public bool IsDeleted { get; private set; }
 
-    // Shadow property for EF
-    public ICollection<Role> Roles { get; set; } = null!;
+    // Navigation property for EF
+    public ICollection<Role> RolesNavigation { get; set; } = null!;
 
-    // Shadow property for EF
-    public ICollection<Message> Messages { get; set; } = null!;
+    // Navigation property for EF
+    public ICollection<Message> MessagesNavigation { get; set; } = null!;
 
-    // Shadow property for EF
-    public User User { get; set; } = null!;
+    // Navigation property for EF
+    public User UserNavigation { get; set; } = null!;
 
     public static Result<Discussion> Create(
         Guid userCreatedBy,

@@ -44,10 +44,10 @@ public sealed class User : Entity
     public bool IsDeleted { get; private set; }
 
     // Navigation property for EF
-    public ReadOnlyCollection<Discussion> DiscussionsNavigation { get; set; } = null!;
+    public ICollection<Discussion> DiscussionsNavigation { get; set; } = null!;
 
-    // Shadow property for EF
-    public ICollection<Message> Messages { get; set; } = null!;
+    // Navigation property for EF
+    public ICollection<Message> MessagesNavigation { get; set; } = null!;
 
     public static Result<User> Create(
         string username,
