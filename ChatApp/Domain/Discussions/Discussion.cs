@@ -1,4 +1,5 @@
-﻿using Domain.Messages;
+﻿using Domain.Bans;
+using Domain.Messages;
 using Domain.Roles;
 using Domain.Users;
 using SharedKernel;
@@ -38,7 +39,10 @@ public sealed class Discussion : Entity
     public ICollection<Message> MessagesNavigation { get; set; } = null!;
 
     // Navigation property for EF
-    public User UserNavigation { get; set; } = null!;
+    public User UserCreatedByNavigation { get; set; } = null!;
+
+    // Navigation property for EF
+    public ICollection<Ban> BansNavigation { get; set; } = null!;
 
     public static Result<Discussion> Create(
         Guid userCreatedBy,

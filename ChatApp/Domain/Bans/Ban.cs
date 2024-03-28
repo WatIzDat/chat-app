@@ -1,4 +1,6 @@
-﻿using SharedKernel;
+﻿using Domain.Discussions;
+using Domain.Users;
+using SharedKernel;
 
 namespace Domain.Bans;
 
@@ -29,6 +31,12 @@ public sealed class Ban : Entity
     public BanDetails BanDetails { get; private set; }
 
     public bool IsUnbanned { get; private set; }
+
+    // Navigation property for EF
+    public User UserNavigation { get; set; } = null!;
+
+    // Navigation property for EF
+    public Discussion DiscussionNavigation { get; set; } = null!;
 
     public static Ban Create(
         Guid userId,

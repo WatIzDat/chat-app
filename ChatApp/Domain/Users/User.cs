@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Domain.Bans;
 using Domain.Discussions;
 using Domain.Messages;
 using SharedKernel;
@@ -48,6 +49,9 @@ public sealed class User : Entity
 
     // Navigation property for EF
     public ICollection<Message> MessagesNavigation { get; set; } = null!;
+
+    // Navigation property for EF
+    public ICollection<Ban> BansNavigation { get; set; } = null!;
 
     public static Result<User> Create(
         string username,

@@ -33,7 +33,7 @@ internal class DiscussionEntityConfiguration : IEntityTypeConfiguration<Discussi
             .HasColumnName("is_deleted");
 
         builder
-            .HasOne(d => d.UserNavigation)
+            .HasOne(d => d.UserCreatedByNavigation)
             .WithMany(u => u.DiscussionsNavigation)
             .HasForeignKey(d => d.UserCreatedBy);
     }
