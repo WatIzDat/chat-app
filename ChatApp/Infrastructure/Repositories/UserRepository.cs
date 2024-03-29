@@ -1,5 +1,6 @@
 ﻿using Domain.Users;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -7,28 +8,35 @@ public sealed class UserRepository(ApplicationDbContext dbContext) : IUserReposi
 {
     private readonly ApplicationDbContext dbContext = dbContext;
 
-    public Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
 
     public void Insert(User user)
     {
-        throw new NotImplementedException();
+        dbContext.Set<User>().Add(user);
     }
 
-    public Task<bool> IsEmailUniqueAsync(Email email, CancellationToken cancellationToken = default)
+    public async Task<bool> IsEmailUniqueAsync(Email email, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        bool exists = await dbContext.Users
+            .AnyAsync(u => u.Email == email, cancellationToken);
+
+        // Unique means not existing, so negation is done
+        return !exists;
     }
 
     public void Update(User user)
     {
-        throw new NotImplementedException();
+        dbContext.Set<User>().Update(user);
     }
 
-    public Task<bool> UserExistsAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> UserExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Users
+            .AnyAsync(u => u.Id == id, cancellationToken);
     }
 }
