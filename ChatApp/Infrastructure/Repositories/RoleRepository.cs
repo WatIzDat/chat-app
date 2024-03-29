@@ -1,6 +1,7 @@
 ﻿using Domain.Roles;
 using Domain.Users;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -10,36 +11,41 @@ public sealed class RoleRepository(ApplicationDbContext dbContext) : IRoleReposi
 
     public void Delete(Role role)
     {
-        throw new NotImplementedException();
+        dbContext.Set<Role>().Remove(role);
     }
 
-    public Task<bool> DuplicateRoleNamesInDiscussionAsync(string roleName, Guid discussionId, CancellationToken cancellationToken = default)
+    public async Task<bool> DuplicateRoleNamesInDiscussionAsync(string roleName, Guid discussionId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Roles
+            .AnyAsync(r => r.DiscussionId == discussionId && r.Name == roleName, cancellationToken);
     }
 
-    public Task<Role?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Role?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Roles
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
     }
 
     public void Insert(Role role)
     {
-        throw new NotImplementedException();
+        dbContext.Set<Role>().Add(role);
     }
 
-    public Task<bool> RoleExistsAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> RoleExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Roles
+            .AnyAsync(r => r.Id == id, cancellationToken);
     }
 
-    public Task<bool> RoleInDiscussionsListAsync(Guid id, DiscussionsList discussions, CancellationToken cancellationToken = default)
+    public async Task<bool> RoleInDiscussionsListAsync(Guid id, DiscussionsList discussions, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Roles
+            .AnyAsync(r => discussions.Value.Any(d => r.DiscussionId == d), cancellationToken);
     }
 
     public void Update(Role role)
     {
-        throw new NotImplementedException();
+        dbContext.Set<Role>().Update(role);
     }
 }
