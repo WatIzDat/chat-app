@@ -8,7 +8,7 @@ namespace Application.Behaviors;
 
 public sealed class UnitOfWorkBehavior<TRequest, TResponse>(IUnitOfWork unitOfWork)
     : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : ICommand where TResponse : Result
+    where TRequest : notnull
 {
     private readonly IUnitOfWork unitOfWork = unitOfWork;
 
@@ -17,7 +17,7 @@ public sealed class UnitOfWorkBehavior<TRequest, TResponse>(IUnitOfWork unitOfWo
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        using TransactionScope transactionScope = new();
+        using TransactionScope transactionScope = new(TransactionScopeAsyncFlowOption.Enabled);
 
         TResponse response = await next();
 

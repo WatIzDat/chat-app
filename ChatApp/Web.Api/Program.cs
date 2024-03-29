@@ -25,6 +25,7 @@ builder.Services.AddMediatR(options =>
 
 builder
     .Services
+    .AddApplication()
     .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddControllers();

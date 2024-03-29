@@ -42,14 +42,14 @@ internal class UserEntityConfiguration : IEntityTypeConfiguration<User>
         builder
             .Property(u => u.Discussions)
             .HasConversion(
-                discussions => discussions.Value,
+                discussions => discussions.Value.ToList(),
                 value => DiscussionsList.Create(value.ToList()).Value)
             .HasColumnName("discussions");
 
         builder
             .Property(u => u.Roles)
             .HasConversion(
-                roles => roles.Value,
+                roles => roles.Value.ToList(),
                 value => RolesList.Create(value.ToList()).Value)
             .HasColumnName("roles");
 
