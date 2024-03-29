@@ -1,5 +1,6 @@
 ﻿using Domain.Messages;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -9,21 +10,23 @@ public class MessageRepository(ApplicationDbContext dbContext) : IMessageReposit
 
     public void Delete(Message message)
     {
-        throw new NotImplementedException();
+        dbContext.Set<Message>().Remove(message);
     }
 
-    public Task<Message?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Message?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Messages
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
     }
 
     public void Insert(Message message)
     {
-        throw new NotImplementedException();
+        dbContext.Set<Message>().Add(message);
     }
 
     public void Update(Message message)
     {
-        throw new NotImplementedException();
+        dbContext.Set<Message>().Update(message);
     }
 }
