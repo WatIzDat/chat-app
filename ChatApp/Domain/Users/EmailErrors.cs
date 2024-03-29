@@ -4,6 +4,6 @@ namespace Domain.Users;
 
 public static class EmailErrors
 {
-    public static readonly Error Empty = new("Email.Empty", "Email was null or empty.");
-    public static readonly Error InvalidFormat = new("Email.InvalidFormat", "Email had an invalid format.");
+    public static readonly Error Empty = Error.Validation("Email.Empty", "Email was null or empty.");
+    public static readonly Error InvalidFormat = Error.Validation("Email.InvalidFormat", "Email had an invalid format.");
 }
