@@ -93,14 +93,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_created_by");
 
-                    b.Property<Guid>("UserCreatedByNavigationId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UserCreatedBy");
-
-                    b.HasIndex("UserCreatedByNavigationId");
 
                     b.ToTable("discussion", (string)null);
                 });
@@ -162,7 +157,8 @@ namespace Infrastructure.Migrations
 
                     b.Property<IEnumerable<string>>("Permissions")
                         .IsRequired()
-                        .HasColumnType("text[]");
+                        .HasColumnType("text[]")
+                        .HasColumnName("permissions");
 
                     b.HasKey("Id");
 
@@ -189,7 +185,8 @@ namespace Infrastructure.Migrations
 
                     b.Property<ReadOnlyCollection<Guid>>("Discussions")
                         .IsRequired()
-                        .HasColumnType("uuid[]");
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("discussions");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -202,7 +199,8 @@ namespace Infrastructure.Migrations
 
                     b.Property<ReadOnlyCollection<Guid>>("Roles")
                         .IsRequired()
-                        .HasColumnType("uuid[]");
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("roles");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -244,15 +242,9 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Discussions.Discussion", b =>
                 {
-                    b.HasOne("Domain.Users.User", null)
+                    b.HasOne("Domain.Users.User", "UserCreatedByNavigation")
                         .WithMany("DiscussionsNavigation")
                         .HasForeignKey("UserCreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Users.User", "UserCreatedByNavigation")
-                        .WithMany()
-                        .HasForeignKey("UserCreatedByNavigationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

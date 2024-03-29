@@ -22,3 +22,12 @@ services:
       - ./.containers/chat-app-db:/var/lib/postgresql/data
     ports:
       - 5432:5432
+
+  web.pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: web.pgadmin
+    ports:
+      - 5555:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=abc@def.com
+      - PGADMIN_DEFAULT_PASSWORD=password

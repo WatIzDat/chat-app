@@ -21,8 +21,8 @@ namespace Infrastructure.Migrations
                     email = table.Column<string>(type: "text", nullable: false),
                     date_created_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     about_section = table.Column<string>(type: "text", nullable: false),
-                    Discussions = table.Column<ReadOnlyCollection<Guid>>(type: "uuid[]", nullable: false),
-                    Roles = table.Column<ReadOnlyCollection<Guid>>(type: "uuid[]", nullable: false),
+                    discussions = table.Column<ReadOnlyCollection<Guid>>(type: "uuid[]", nullable: false),
+                    roles = table.Column<ReadOnlyCollection<Guid>>(type: "uuid[]", nullable: false),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -38,18 +38,11 @@ namespace Infrastructure.Migrations
                     user_created_by = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     date_created_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
-                    UserCreatedByNavigationId = table.Column<Guid>(type: "uuid", nullable: false)
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_discussion", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_discussion_user_UserCreatedByNavigationId",
-                        column: x => x.UserCreatedByNavigationId,
-                        principalTable: "user",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_discussion_user_user_created_by",
                         column: x => x.user_created_by,
@@ -122,7 +115,7 @@ namespace Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     discussion_id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    Permissions = table.Column<string[]>(type: "text[]", nullable: false)
+                    permissions = table.Column<string[]>(type: "text[]", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -144,11 +137,6 @@ namespace Infrastructure.Migrations
                 name: "IX_ban_user_id",
                 table: "ban",
                 column: "user_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_discussion_UserCreatedByNavigationId",
-                table: "discussion",
-                column: "UserCreatedByNavigationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_discussion_user_created_by",
