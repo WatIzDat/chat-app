@@ -10,6 +10,11 @@ public sealed class Discussion : Entity
 {
     public const int NameMaxLength = 50;
 
+    // Private parameterless constructor for EF
+    private Discussion()
+    {
+    }
+
     private Discussion(
         Guid id,
         Guid userCreatedBy,

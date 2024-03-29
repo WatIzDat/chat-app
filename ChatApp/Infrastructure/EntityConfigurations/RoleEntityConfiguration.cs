@@ -29,7 +29,8 @@ internal class RoleEntityConfiguration : IEntityTypeConfiguration<Role>
             .Property(r => r.Permissions)
             .HasConversion(
                 permissions => permissions.Select(p => p.Value),
-                value => value.Select(v => Permission.Create(v).Value).ToList());
+                value => value.Select(v => Permission.Create(v).Value).ToList())
+            .HasColumnName("permissions");
 
         builder
             .HasOne(r => r.DiscussionNavigation)

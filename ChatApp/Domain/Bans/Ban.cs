@@ -6,6 +6,11 @@ namespace Domain.Bans;
 
 public sealed class Ban : Entity
 {
+    // Private parameterless constructor for EF
+    private Ban()
+    {
+    }
+    
     private Ban(
         Guid id,
         Guid userId,

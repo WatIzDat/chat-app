@@ -10,6 +10,11 @@ public sealed class User : Entity
 {
     public const int UsernameMaxLength = 20;
 
+    // Private parameterless constructor for EF
+    private User()
+    {
+    }
+
     private User(
         Guid id,
         string username,

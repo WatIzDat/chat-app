@@ -43,17 +43,15 @@ internal class UserEntityConfiguration : IEntityTypeConfiguration<User>
             .Property(u => u.Discussions)
             .HasConversion(
                 discussions => discussions.Value,
-                value => DiscussionsList.Create(value.ToList()).Value);
-
-        builder
-            .HasMany(u => u.DiscussionsNavigation)
-            .WithOne();
+                value => DiscussionsList.Create(value.ToList()).Value)
+            .HasColumnName("discussions");
 
         builder
             .Property(u => u.Roles)
             .HasConversion(
                 roles => roles.Value,
-                value => RolesList.Create(value.ToList()).Value);
+                value => RolesList.Create(value.ToList()).Value)
+            .HasColumnName("roles");
 
         builder
             .Property(u => u.IsDeleted)

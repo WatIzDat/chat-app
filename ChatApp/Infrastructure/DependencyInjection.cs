@@ -10,8 +10,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        string connectionString = configuration.GetConnectionString("NpgsqlDatabase")
-            ?? throw new Exception("Connection string 'NpgsqlDatabase' was not found.");
+        string connectionString = configuration.GetConnectionString("PostgresDatabase")
+            ?? throw new Exception("Connection string 'PostgresDatabase' was not found.");
 
         services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
         {

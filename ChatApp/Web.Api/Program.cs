@@ -1,3 +1,9 @@
+using Application;
+using Domain;
+using Infrastructure;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder
@@ -5,12 +11,21 @@ builder
     .Scan(
         selector => selector
             .FromAssemblies(
-                Infrastructure.AssemblyReference.Assembly)
+                InfrastructureAssemblyReference.Assembly)
             .AddClasses(false)
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 
+builder.Services.AddMediatR(options =>
+{
+    options.RegisterServicesFromAssemblies(DomainAssemblyReference.Assembly, ApplicationAssemblyReference.Assembly);
+});
+
 // Add services to the container.
+
+builder
+    .Services
+    .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -24,6 +39,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    using IServiceScope scope = app.Services.CreateScope();
+
+    using ApplicationDbContext dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    dbContext.Database.Migrate();
 }
 
 app.UseHttpsRedirection();

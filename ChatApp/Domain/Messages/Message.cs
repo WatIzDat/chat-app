@@ -8,6 +8,11 @@ public sealed class Message : Entity
 {
     public const int ContentsMaxLength = 500;
 
+    // Private parameterless constructor for EF
+    private Message()
+    {
+    }
+
     private Message(
         Guid id,
         Guid userId,

@@ -8,6 +8,11 @@ public sealed class Role : Entity
 {
     public const int NameMaxLength = 20;
 
+    // Private parameterless constructor for EF
+    private Role()
+    {
+    }
+
     private Role(
         Guid id,
         Guid discussionId,
