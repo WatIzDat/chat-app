@@ -1,5 +1,6 @@
 ﻿using Domain.Discussions;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -7,23 +8,26 @@ public sealed class DiscussionRepository(ApplicationDbContext dbContext) : IDisc
 {
     private readonly ApplicationDbContext dbContext = dbContext;
 
-    public Task<bool> DiscussionExistsAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> DiscussionExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Discussions
+            .AnyAsync(d => d.Id == id, cancellationToken);
     }
 
-    public Task<Discussion?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Discussion?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Discussions
+            .AsNoTracking()
+            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
     }
 
     public void Insert(Discussion discussion)
     {
-        throw new NotImplementedException();
+        dbContext.Set<Discussion>().Add(discussion);
     }
 
     public void Update(Discussion discussion)
     {
-        throw new NotImplementedException();
+        dbContext.Set<Discussion>().Update(discussion);
     }
 }
