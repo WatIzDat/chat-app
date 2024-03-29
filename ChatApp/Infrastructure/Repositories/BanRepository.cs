@@ -1,5 +1,6 @@
 ﻿using Domain.Bans;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -7,23 +8,29 @@ public sealed class BanRepository(ApplicationDbContext dbContext) : IBanReposito
 {
     private readonly ApplicationDbContext dbContext = dbContext;
 
-    public Task<bool> BanExistsByUserAndDiscussionIdAsync(Guid userId, Guid discussionId, CancellationToken cancellationToken = default)
+    public async Task<bool> BanExistsByUserAndDiscussionIdAsync(Guid userId, Guid discussionId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Bans
+            .AnyAsync(b => b.UserId == userId &&
+                           b.DiscussionId == discussionId &&
+                           b.IsUnbanned == false,
+                           cancellationToken);
     }
 
-    public Task<Ban?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Ban?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Bans
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
     }
 
     public void Insert(Ban ban)
     {
-        throw new NotImplementedException();
+        dbContext.Set<Ban>().Add(ban);
     }
 
     public void Update(Ban ban)
     {
-        throw new NotImplementedException();
+        dbContext.Set<Ban>().Update(ban);
     }
 }
