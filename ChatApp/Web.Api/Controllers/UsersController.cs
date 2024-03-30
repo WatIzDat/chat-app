@@ -1,7 +1,10 @@
-﻿using Application.Users.AddRole;
+﻿using Application.Users;
+using Application.Users.AddRole;
 using Application.Users.ChangeEmail;
 using Application.Users.ChangeUsername;
 using Application.Users.DeleteUser;
+using Application.Users.GetUsersByDiscussionIdAndRoleId;
+using Application.Users.GetUsersWithNoRoleByDiscussionId;
 using Application.Users.JoinDiscussion;
 using Application.Users.LeaveDiscussion;
 using Application.Users.RegisterUser;
@@ -59,6 +62,47 @@ public sealed class UsersController(ISender sender) : ApiController(sender)
 
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
+
+    [HttpGet("get-users-by-discussion-id-and-role-id")]
+    public async Task<IResult> GetUsersByDiscussionIdAndRoleId(
+        [FromQuery] Guid discussionId,
+        [FromQuery] Guid roleId,
+        [FromQuery] DateTimeOffset lastDateCreatedUtc,
+        [FromQuery] Guid lastUserId,
+        [FromQuery] int limit,
+        CancellationToken cancellationToken)
+    {
+        GetUsersByDiscussionIdAndRoleIdQuery query = new(
+            discussionId,
+            roleId,
+            lastDateCreatedUtc,
+            lastUserId,
+            limit);
+
+        Result<List<UserResponse>> result = await Sender.Send(query, cancellationToken);
+
+        return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
+    }
+
+    [HttpGet("get-users-with-no-role-by-discussion-id")]
+    public async Task<IResult> GetUsersWithNoRoleByDiscussionId(
+        [FromQuery] Guid discussionId,
+        [FromQuery] DateTimeOffset lastDateCreatedUtc,
+        [FromQuery] Guid lastUserId,
+        [FromQuery] int limit,
+        CancellationToken cancellationToken)
+    {
+        GetUsersWithNoRoleByDiscussionIdQuery query = new(
+            discussionId,
+            lastDateCreatedUtc,
+            lastUserId,
+            limit);
+
+        Result<List<UserResponse>> result = await Sender.Send(query, cancellationToken);
+
+        return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
+    }
+
 
     [HttpPost("join-discussion")]
     public async Task<IResult> JoinDiscussion(
