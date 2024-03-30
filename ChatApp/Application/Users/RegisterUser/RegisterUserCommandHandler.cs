@@ -59,7 +59,11 @@ internal sealed class RegisterUserCommandHandler(
         RolesList roles = rolesResult.Value;
 
 
-        // TODO: Check username is unique
+        if (!await userRepository.IsUsernameUniqueAsync(request.Username, cancellationToken))
+        {
+            return Result.Failure<Guid>(UserErrors.UsernameNotUnique);
+        }
+
 
         Result<User> userResult = User.Create(
             request.Username,

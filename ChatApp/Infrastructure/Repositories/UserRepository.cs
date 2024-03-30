@@ -23,7 +23,16 @@ public sealed class UserRepository(ApplicationDbContext dbContext) : IUserReposi
     public async Task<bool> IsEmailUniqueAsync(Email email, CancellationToken cancellationToken = default)
     {
         bool exists = await dbContext.Users
-            .AnyAsync(u => u.Email == email, cancellationToken);
+            .AnyAsync(u => u.Email == email && u.IsDeleted == false, cancellationToken);
+
+        // Unique means not existing, so negation is done
+        return !exists;
+    }
+
+    public async Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken = default)
+    {
+        bool exists = await dbContext.Users
+            .AnyAsync(u => u.Username == username && u.IsDeleted == false, cancellationToken);
 
         // Unique means not existing, so negation is done
         return !exists;

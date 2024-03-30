@@ -10,5 +10,7 @@ public interface IUserRepository
 
     Task<bool> IsEmailUniqueAsync(Email email, CancellationToken cancellationToken = default);
 
+    Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken = default);
+
     Task<bool> UserExistsAsync(Guid id, CancellationToken cancellationToken = default);
 }

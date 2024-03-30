@@ -18,6 +18,11 @@ internal sealed class ChangeUsernameCommandHandler(IUserRepository userRepositor
             return Result.Failure(UserErrors.NotFound);
         }
 
+        if (!await userRepository.IsUsernameUniqueAsync(request.Username, cancellationToken))
+        {
+            return Result.Failure(UserErrors.UsernameNotUnique);
+        }
+
         Result result = user.ChangeUsername(request.Username);
 
         if (result.IsFailure)
