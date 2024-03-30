@@ -13,7 +13,7 @@ internal sealed class GetCreatedDiscussionsByUser(IApplicationDbContext dbContex
     public async Task<Result<List<DiscussionResponse>>> Handle(GetCreatedDiscussionsByUserQuery request, CancellationToken cancellationToken)
     {
         List<DiscussionResponse> discussions = await dbContext.Discussions
-            .Where(d => d.UserCreatedBy == request.UserId)
+            .Where(d => d.UserCreatedBy == request.UserId && d.IsDeleted == false)
             .Select(d => new DiscussionResponse
             {
                 Id = d.Id,
