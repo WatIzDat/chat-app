@@ -34,7 +34,7 @@ internal class DiscussionEntityConfiguration : IEntityTypeConfiguration<Discussi
 
         builder
             .HasOne(d => d.UserCreatedByNavigation)
-            .WithMany(u => u.DiscussionsNavigation)
+            .WithMany(u => u.CreatedDiscussionsNavigation)
             .HasForeignKey(d => d.UserCreatedBy);
     }
 }

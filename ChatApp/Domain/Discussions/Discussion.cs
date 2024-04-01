@@ -49,6 +49,9 @@ public sealed class Discussion : Entity
     // Navigation property for EF
     public ICollection<Ban> BansNavigation { get; set; } = null!;
 
+    // Navigation property for EF
+    public ICollection<User> JoinedUsersNavigation { get; set; } = null!;
+
     public static Result<Discussion> Create(
         Guid userCreatedBy,
         string name,

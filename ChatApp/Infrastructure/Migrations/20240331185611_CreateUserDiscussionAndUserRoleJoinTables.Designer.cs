@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240331185611_CreateUserDiscussionAndUserRoleJoinTables")]
+    partial class CreateUserDiscussionAndUserRoleJoinTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -212,30 +215,30 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("user_to_added_role", b =>
                 {
-                    b.Property<Guid>("role_id")
+                    b.Property<Guid>("RolesNavigationId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("user_id")
+                    b.Property<Guid>("UsersNavigationId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("role_id", "user_id");
+                    b.HasKey("RolesNavigationId", "UsersNavigationId");
 
-                    b.HasIndex("user_id");
+                    b.HasIndex("UsersNavigationId");
 
                     b.ToTable("user_to_added_role");
                 });
 
             modelBuilder.Entity("user_to_joined_discussion", b =>
                 {
-                    b.Property<Guid>("discussion_id")
+                    b.Property<Guid>("JoinedDiscussionsNavigationId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("user_id")
+                    b.Property<Guid>("JoinedUsersNavigationId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("discussion_id", "user_id");
+                    b.HasKey("JoinedDiscussionsNavigationId", "JoinedUsersNavigationId");
 
-                    b.HasIndex("user_id");
+                    b.HasIndex("JoinedUsersNavigationId");
 
                     b.ToTable("user_to_joined_discussion");
                 });
@@ -304,13 +307,13 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Roles.Role", null)
                         .WithMany()
-                        .HasForeignKey("role_id")
+                        .HasForeignKey("RolesNavigationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Users.User", null)
                         .WithMany()
-                        .HasForeignKey("user_id")
+                        .HasForeignKey("UsersNavigationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -319,13 +322,13 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Discussions.Discussion", null)
                         .WithMany()
-                        .HasForeignKey("discussion_id")
+                        .HasForeignKey("JoinedDiscussionsNavigationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Users.User", null)
                         .WithMany()
-                        .HasForeignKey("user_id")
+                        .HasForeignKey("JoinedUsersNavigationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

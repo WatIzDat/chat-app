@@ -14,7 +14,11 @@ internal sealed class GetJoinedDiscussionsByUserQueryHandler(IApplicationDbConte
 
     public async Task<Result<List<DiscussionResponse>>> Handle(GetJoinedDiscussionsByUserQuery request, CancellationToken cancellationToken)
     {
-        ReadOnlyCollection<Guid>? discussionIds = await dbContext.Users
+        //ReadOnlyCollection<Guid>? discussionIds = await dbContext.Users
+        //    .Where(u => u.Id == request.UserId && u.IsDeleted == false)
+        //    .Select(u => u.Discussions.Value)
+        //    .FirstOrDefaultAsync(cancellationToken);
+        List<Guid>? discussionIds = await dbContext.Users
             .Where(u => u.Id == request.UserId && u.IsDeleted == false)
             .Select(u => u.Discussions.Value)
             .FirstOrDefaultAsync(cancellationToken);

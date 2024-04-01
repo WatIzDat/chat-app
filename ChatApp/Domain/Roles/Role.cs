@@ -1,4 +1,5 @@
 ﻿using Domain.Discussions;
+using Domain.Users;
 using SharedKernel;
 using SharedKernel.Utility;
 
@@ -33,6 +34,9 @@ public sealed class Role : Entity
 
     // Navigation property for EF
     public Discussion DiscussionNavigation { get; set; } = null!;
+
+    // Navigation property for EF
+    public ICollection<User> UsersNavigation { get; set; } = null!;
 
     public static Result<Role> Create(
         Guid discussionId,

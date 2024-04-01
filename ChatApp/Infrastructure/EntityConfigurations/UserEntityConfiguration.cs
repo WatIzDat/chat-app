@@ -1,3 +1,5 @@
+using Domain.Discussions;
+using Domain.Roles;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -39,19 +41,41 @@ internal class UserEntityConfiguration : IEntityTypeConfiguration<User>
                 value => AboutSection.Create(value).Value)
             .HasColumnName("about_section");
 
-        builder
-            .Property(u => u.Discussions)
-            .HasConversion(
-                discussions => discussions.Value.ToList(),
-                value => DiscussionsList.Create(value.ToList()).Value)
-            .HasColumnName("discussions");
+        //builder
+        //    .Property(u => u.Discussions)
+        //    .HasConversion(
+        //        discussions => discussions.Value.ToList(),
+        //        value => DiscussionsList.Create(value.ToList()).Value)
+        //    .HasColumnName("discussions");
 
         builder
-            .Property(u => u.Roles)
-            .HasConversion(
-                roles => roles.Value.ToList(),
-                value => RolesList.Create(value.ToList()).Value)
-            .HasColumnName("roles");
+            .Ignore(u => u.Discussions);
+
+        builder
+            .Ignore(u => u.Roles);
+
+        builder
+            .HasMany(u => u.JoinedDiscussionsNavigation)
+            .WithMany(d => d.JoinedUsersNavigation)
+            .UsingEntity(
+                "user_to_joined_discussion",
+                l => l.HasOne(typeof(Discussion)).WithMany().HasForeignKey("discussion_id"),
+                r => r.HasOne(typeof(User)).WithMany().HasForeignKey("user_id"));
+
+        builder
+            .HasMany(u => u.RolesNavigation)
+            .WithMany(r => r.UsersNavigation)
+            .UsingEntity(
+                "user_to_added_role",
+                l => l.HasOne(typeof(Role)).WithMany().HasForeignKey("role_id"),
+                r => r.HasOne(typeof(User)).WithMany().HasForeignKey("user_id"));
+
+        //builder
+        //    .Property(u => u.Roles)
+        //    .HasConversion(
+        //        roles => roles.Value.ToList(),
+        //        value => RolesList.Create(value.ToList()).Value)
+        //    .HasColumnName("roles");
 
         builder
             .Property(u => u.IsDeleted)

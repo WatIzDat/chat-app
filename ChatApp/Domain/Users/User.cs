@@ -2,6 +2,7 @@
 using Domain.Bans;
 using Domain.Discussions;
 using Domain.Messages;
+using Domain.Roles;
 using SharedKernel;
 
 namespace Domain.Users;
@@ -50,7 +51,13 @@ public sealed class User : Entity
     public bool IsDeleted { get; private set; }
 
     // Navigation property for EF
-    public ICollection<Discussion> DiscussionsNavigation { get; set; } = null!;
+    public ICollection<Discussion> CreatedDiscussionsNavigation { get; set; } = null!;
+
+    // Navigation property for EF
+    public ICollection<Discussion> JoinedDiscussionsNavigation { get; set; } = null!;
+
+    // Navigation property for EF
+    public ICollection<Role> RolesNavigation { get; set; } = null!;
 
     // Navigation property for EF
     public ICollection<Message> MessagesNavigation { get; set; } = null!;
