@@ -10,12 +10,10 @@ public sealed record DiscussionsList
 
     private DiscussionsList(List<Guid> value)
     {
-        //Value = value.AsReadOnly();
-        Value = value;
+        Value = value.AsReadOnly();
     }
 
-    //public ReadOnlyCollection<Guid> Value { get; }
-    public IList<Guid> Value { get; }
+    public ReadOnlyCollection<Guid> Value { get; }
     
     public static Result<DiscussionsList> Create(List<Guid> value)
     {
