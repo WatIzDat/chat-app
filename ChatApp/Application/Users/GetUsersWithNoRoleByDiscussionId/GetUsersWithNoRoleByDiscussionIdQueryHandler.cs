@@ -14,12 +14,20 @@ internal sealed class GetUsersWithNoRoleByDiscussionIdQueryHandler(IApplicationD
     public async Task<Result<List<UserResponse>>> Handle(GetUsersWithNoRoleByDiscussionIdQuery request, CancellationToken cancellationToken)
     {
         IQueryable<User> usersInDiscussion = dbContext.Users
-            .Where(u => u.Discussions.Value.Contains(request.DiscussionId));
+            .FromSql(
+                $"""
+                SELECT *
+                FROM "user"
+                WHERE {request.DiscussionId} = ANY("user".discussions)
+                """);
 
-        IQueryable<User> usersInDiscussionWithNoRole = usersInDiscussion 
-            .Where(u => u.Roles.Value.All(id => dbContext.Roles.Where(r => r.Id == id).Any(r => r.DiscussionId != request.DiscussionId)));
+        IQueryable<User> usersInDiscussionWithNoRole = usersInDiscussion
+            .Where(u => u.Roles.Value.Any(
+                id => dbContext.Roles.Where(
+                    r => r.Id == id).Any(
+                        r => r.DiscussionId != request.DiscussionId)));
 
-        IQueryable<UserResponse> mappedUsers = usersInDiscussionWithNoRole
+        IQueryable<UserResponse> mappedUsers = usersInDiscussion
             .Select(u => new UserResponse
             {
                 Id = u.IsDeleted ? Guid.Empty : u.Id,
@@ -29,14 +37,16 @@ internal sealed class GetUsersWithNoRoleByDiscussionIdQueryHandler(IApplicationD
                 AboutSection = u.IsDeleted ? "" : u.AboutSection.Value
             });
 
-        IQueryable<UserResponse> paginatedUsers = mappedUsers
-            .OrderBy(u => u.DateCreatedUtc)
-            .ThenBy(u => u.Id)
-            .Where(u => u.DateCreatedUtc > request.LastDateCreatedUtc
-                    || (u.DateCreatedUtc == request.LastDateCreatedUtc && u.Id > request.LastUserId))
-            .Take(request.Limit);
+        // TODO: implement pagination later
 
-        List<UserResponse> finalUsersResult = await paginatedUsers.ToListAsync(cancellationToken);
+        //IQueryable<UserResponse> paginatedUsers = mappedUsers
+        //    .OrderBy(u => u.DateCreatedUtc)
+        //    .ThenBy(u => u.Id)
+        //    .Where(u => u.DateCreatedUtc > request.LastDateCreatedUtc
+        //            || (u.DateCreatedUtc == request.LastDateCreatedUtc && u.Id > request.LastUserId))
+        //    .Take(request.Limit);
+
+        List<UserResponse> finalUsersResult = await mappedUsers.ToListAsync(cancellationToken);
 
         return Result.Success(finalUsersResult);
     }
