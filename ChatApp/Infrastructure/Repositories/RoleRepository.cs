@@ -23,7 +23,6 @@ public sealed class RoleRepository(ApplicationDbContext dbContext) : IRoleReposi
     public async Task<Role?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await dbContext.Roles
-            .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
     }
 

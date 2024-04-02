@@ -26,11 +26,16 @@ internal class RoleEntityConfiguration : IEntityTypeConfiguration<Role>
             .HasColumnName("name");
 
         builder
-            .Property(r => r.Permissions)
-            .HasConversion(
-                permissions => permissions.Select(p => p.Value),
-                value => value.Select(v => Permission.Create(v).Value).ToList())
-            .HasColumnName("permissions");
+            .OwnsMany(r => r.Permissions, permissionsBuilder =>
+            {
+                permissionsBuilder.ToTable("permission");
+
+                permissionsBuilder.WithOwner().HasForeignKey("role_id");
+
+                permissionsBuilder.Property(p => p.Value).HasColumnName("value");
+
+                permissionsBuilder.HasKey("role_id", "Value");
+            });
 
         builder
             .HasOne(r => r.DiscussionNavigation)
