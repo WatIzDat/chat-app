@@ -18,14 +18,13 @@ internal sealed class GetUsersWithNoRoleByDiscussionIdQueryHandler(IApplicationD
                 $"""
                 SELECT *
                 FROM "user"
-                WHERE {request.DiscussionId} = ANY("user".discussions)
+                WHERE {request.DiscussionId} = ANY("user".discussions) AND NOT EXISTS(
+                   	SELECT 1
+                   	FROM "role"
+                   	WHERE "role".id = ANY("user".roles)
+                	AND "role".discussion_id = {request.DiscussionId}
+                )
                 """);
-
-        IQueryable<User> usersInDiscussionWithNoRole = usersInDiscussion
-            .Where(u => u.Roles.Value.Any(
-                id => dbContext.Roles.Where(
-                    r => r.Id == id).Any(
-                        r => r.DiscussionId != request.DiscussionId)));
 
         IQueryable<UserResponse> mappedUsers = usersInDiscussion
             .Select(u => new UserResponse
