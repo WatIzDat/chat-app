@@ -28,7 +28,13 @@ internal sealed class GetUsersByDiscussionIdAndRoleIdQueryHandler(IApplicationDb
         }
 
         List<UserResponse> users = await dbContext.Users
-            .Where(u => u.Discussions.Value.Contains(request.DiscussionId) && u.Roles.Value.Contains(request.RoleId))
+            .FromSql(
+                $"""
+                SELECT *
+                FROM "user"
+                WHERE {request.DiscussionId} = ANY("user".discussions)
+                AND {request.RoleId} = ANY("user".roles)
+                """)
             .Select(u => new UserResponse
             {
                 Id = u.IsDeleted ? Guid.Empty : u.Id,
