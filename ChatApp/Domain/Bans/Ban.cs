@@ -54,13 +54,8 @@ public sealed class Ban : Entity
         return ban;
     }
 
-    public Result UnbanUser(DateTimeOffset currentTime)
+    public Result UnbanUser()
     {
-        if (currentTime < BanDetails.DateOfUnbanUtc)
-        {
-            return Result.Failure(BanErrors.CurrentTimeEarlierThanDateOfUnban);
-        }
-
         IsUnbanned = true;
 
         return Result.Success();

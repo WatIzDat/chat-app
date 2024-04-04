@@ -5,12 +5,10 @@ using SharedKernel;
 namespace Application.Bans.UnbanUser;
 
 internal sealed class UnbanUserCommandHandler(
-    IBanRepository banRepository,
-    IDateTimeOffsetProvider dateTimeOffsetProvider)
+    IBanRepository banRepository)
     : ICommandHandler<UnbanUserCommand>
 {
     private readonly IBanRepository banRepository = banRepository;
-    private readonly IDateTimeOffsetProvider dateTimeOffsetProvider = dateTimeOffsetProvider;
 
     public async Task<Result> Handle(UnbanUserCommand request, CancellationToken cancellationToken)
     {
@@ -21,7 +19,7 @@ internal sealed class UnbanUserCommandHandler(
             return Result.Failure(BanErrors.NotFound);
         }
 
-        Result result = ban.UnbanUser(dateTimeOffsetProvider.UtcNow);
+        Result result = ban.UnbanUser();
 
         if (result.IsFailure)
         {
