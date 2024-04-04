@@ -14,7 +14,7 @@ public class BanTests
             DateTimeOffset.UtcNow,
             BanDetails.CreatePermanentBan());
 
-        Result result = ban.UnbanUser(DateTimeOffset.UtcNow);
+        Result result = ban.UnbanUser();
 
         result.IsSuccess.Should().BeTrue();
 
@@ -30,7 +30,7 @@ public class BanTests
             DateTimeOffset.UtcNow,
             BanDetails.CreateTemporaryBan(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddDays(1)).Value);
 
-        Result result = ban.UnbanUser(DateTimeOffset.UtcNow);
+        Result result = ban.UnbanUser();
 
         result.Error.Should().Be(BanErrors.CurrentTimeEarlierThanDateOfUnban);
     }

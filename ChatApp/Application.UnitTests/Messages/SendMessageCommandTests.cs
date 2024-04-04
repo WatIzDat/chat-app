@@ -1,4 +1,5 @@
 using Application.Messages.SendMessage;
+using Domain.Bans;
 using Domain.Discussions;
 using Domain.Messages;
 using Domain.Users;
@@ -16,6 +17,7 @@ public class SendMessageCommandTests
     private readonly IMessageRepository messageRepositoryMock;
     private readonly IUserRepository userRepositoryMock;
     private readonly IDiscussionRepository discussionRepositoryMock;
+    private readonly IBanRepository banRepositoryMock;
     private readonly IDateTimeOffsetProvider dateTimeOffsetProviderMock;
 
     public SendMessageCommandTests()
@@ -23,12 +25,14 @@ public class SendMessageCommandTests
         messageRepositoryMock = Substitute.For<IMessageRepository>();
         userRepositoryMock = Substitute.For<IUserRepository>();
         discussionRepositoryMock = Substitute.For<IDiscussionRepository>();
+        banRepositoryMock = Substitute.For<IBanRepository>();
         dateTimeOffsetProviderMock = Substitute.For<IDateTimeOffsetProvider>();
 
         commandHandler = new SendMessageCommandHandler(
             messageRepositoryMock,
             userRepositoryMock,
             discussionRepositoryMock,
+            banRepositoryMock,
             dateTimeOffsetProviderMock);
     }
 
