@@ -35,8 +35,8 @@ internal class BanEntityConfiguration : IEntityTypeConfiguration<Ban>
                 .HasColumnName("is_ban_permanent");
 
             banDetailsBuilder
-                .Property(b => b.DateOfUnbanUtc)
-                .HasColumnName("date_of_unban_utc");
+                .Property(b => b.DateWillBeUnbannedUtc)
+                .HasColumnName("date_will_be_unbanned_utc");
         });
 
         builder

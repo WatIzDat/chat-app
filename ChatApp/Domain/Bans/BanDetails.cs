@@ -6,15 +6,15 @@ public sealed record BanDetails
 {
     private BanDetails(
         bool isBanPermanent,
-        DateTimeOffset? dateOfUnbanUtc)
+        DateTimeOffset? dateWillBeUnbannedUtc)
     {
         IsBanPermanent = isBanPermanent;
-        DateOfUnbanUtc = dateOfUnbanUtc;
+        DateWillBeUnbannedUtc = dateWillBeUnbannedUtc;
     }
 
     public bool IsBanPermanent { get; }
 
-    public DateTimeOffset? DateOfUnbanUtc { get; }
+    public DateTimeOffset? DateWillBeUnbannedUtc { get; }
 
     public static Result<BanDetails> CreateTemporaryBan(DateTimeOffset currentTime, DateTimeOffset dateOfUnbanUtc)
     {
@@ -30,7 +30,7 @@ public sealed record BanDetails
 
     public static BanDetails CreatePermanentBan()
     {
-        BanDetails banDetails = new(isBanPermanent: true, dateOfUnbanUtc: null);
+        BanDetails banDetails = new(isBanPermanent: true, dateWillBeUnbannedUtc: null);
 
         return banDetails;
     }

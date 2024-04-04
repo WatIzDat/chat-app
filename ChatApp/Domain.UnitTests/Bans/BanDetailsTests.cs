@@ -12,7 +12,7 @@ public class BanDetailsTests
         BanDetails banDetails = BanDetails.CreateTemporaryBan(utcNow, utcNow.AddDays(1)).Value;
 
         banDetails.IsBanPermanent.Should().BeFalse();
-        banDetails.DateOfUnbanUtc.Should().Be(utcNow.AddDays(1));
+        banDetails.DateWillBeUnbannedUtc.Should().Be(utcNow.AddDays(1));
     }
 
     [Fact]
@@ -21,6 +21,6 @@ public class BanDetailsTests
         BanDetails banDetails = BanDetails.CreatePermanentBan();
 
         banDetails.IsBanPermanent.Should().BeTrue();
-        banDetails.DateOfUnbanUtc.Should().BeNull();
+        banDetails.DateWillBeUnbannedUtc.Should().BeNull();
     }
 }
