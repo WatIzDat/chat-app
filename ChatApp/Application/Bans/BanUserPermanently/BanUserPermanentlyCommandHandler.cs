@@ -20,12 +20,12 @@ internal sealed class BanUserPermanentlyCommandHandler(
 
     public async Task<Result<Guid>> Handle(BanUserPermanentlyCommand request, CancellationToken cancellationToken)
     {
-        if (!await userRepository.UserExistsAsync(request.UserId))
+        if (!await userRepository.UserExistsAsync(request.UserId, cancellationToken))
         {
             return Result.Failure<Guid>(UserErrors.NotFound);
         }
 
-        if (!await discussionRepository.DiscussionExistsAsync(request.DiscussionId))
+        if (!await discussionRepository.DiscussionExistsAsync(request.DiscussionId, cancellationToken))
         {
             return Result.Failure<Guid>(DiscussionErrors.NotFound);
         }
