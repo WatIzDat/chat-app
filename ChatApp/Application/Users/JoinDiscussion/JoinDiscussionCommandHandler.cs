@@ -27,6 +27,14 @@ internal sealed class JoinDiscussionCommandHandler(
             return Result.Failure(DiscussionErrors.NotFound);
         }
 
+        if (await discussionRepository.DiscussionCreatedByUserAsync(
+            request.DiscussionId,
+            request.UserId,
+            cancellationToken))
+        {
+            return Result.Failure(UserErrors.CannotJoinCreatedDiscussion);
+        }
+
         Result result = user.JoinDiscussion(request.DiscussionId);
 
         if (result.IsFailure)

@@ -9,4 +9,6 @@ public interface IDiscussionRepository
     Task<Discussion?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<bool> DiscussionExistsAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task<bool> DiscussionCreatedByUserAsync(Guid discussionId, Guid userId, CancellationToken cancellationToken = default);
 }

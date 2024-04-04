@@ -14,6 +14,15 @@ public sealed class DiscussionRepository(ApplicationDbContext dbContext) : IDisc
             .AnyAsync(d => d.Id == id, cancellationToken);
     }
 
+    public async Task<bool> DiscussionCreatedByUserAsync(
+        Guid discussionId,
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Discussions
+            .AnyAsync(d => d.Id == discussionId && d.UserCreatedBy == userId, cancellationToken);
+    }
+
     public async Task<Discussion?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await dbContext.Discussions

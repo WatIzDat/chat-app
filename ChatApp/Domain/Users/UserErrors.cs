@@ -32,6 +32,10 @@ public static class UserErrors
         "User.UserBannedFromDiscussion",
         "The user cannot perform the requested action due to being banned from the discussion.");
 
+    public static readonly Error CannotJoinCreatedDiscussion = Error.Validation(
+        "User.CannotJoinCreatedDiscussion",
+        "A user cannot join the user's own discussion.");
+
     public static readonly Error NotFound = Error.NotFound(
         "User.NotFound",
         "The user with the requested ID was not found.");
