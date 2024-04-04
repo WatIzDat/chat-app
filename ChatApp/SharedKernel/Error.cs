@@ -36,6 +36,11 @@ public sealed record Error
     {
         return new(code, description, ErrorType.Conflict);
     }
+
+    public static Error Forbidden(string code, string description)
+    {
+        return new(code, description, ErrorType.Forbidden);
+    }
 }
 
 public enum ErrorType
@@ -44,5 +49,6 @@ public enum ErrorType
     Failure,
     Validation,
     NotFound,
-    Conflict
+    Conflict,
+    Forbidden
 }

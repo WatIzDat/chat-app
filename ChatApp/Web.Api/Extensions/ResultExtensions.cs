@@ -27,6 +27,7 @@ public static class ResultExtensions
                 ErrorType.Validation => StatusCodes.Status400BadRequest,
                 ErrorType.NotFound => StatusCodes.Status404NotFound,
                 ErrorType.Conflict => StatusCodes.Status409Conflict,
+                ErrorType.Forbidden => StatusCodes.Status403Forbidden,
                 _ => StatusCodes.Status500InternalServerError
             };
         }
@@ -38,6 +39,7 @@ public static class ResultExtensions
                 ErrorType.Validation => "Bad Request",
                 ErrorType.NotFound => "Not Found",
                 ErrorType.Conflict => "Conflict",
+                ErrorType.Forbidden => "Forbidden",
                 _ => "Internal Server Error"
             };
         }
@@ -49,6 +51,7 @@ public static class ResultExtensions
                 ErrorType.Validation => "https://www.rfc-editor.org/rfc/rfc9110.html#name-400-bad-request",
                 ErrorType.NotFound => "https://www.rfc-editor.org/rfc/rfc9110.html#name-404-not-found",
                 ErrorType.Conflict => "https://www.rfc-editor.org/rfc/rfc9110.html#name-409-conflict",
+                ErrorType.Forbidden => "https://www.rfc-editor.org/rfc/rfc9110.html#name-403-forbidden",
                 _ => "https://www.rfc-editor.org/rfc/rfc9110.html#name-500-internal-server-error"
             };
         }

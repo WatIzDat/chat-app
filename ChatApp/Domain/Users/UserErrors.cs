@@ -28,6 +28,10 @@ public static class UserErrors
         "User.UsernameNotUnique",
         "A user with the requested username is already in the database.");
 
+    public static readonly Error UserBannedFromDiscussion = Error.Forbidden(
+        "User.UserBannedFromDiscussion",
+        "The user cannot perform the requested action due to being banned from the discussion.");
+
     public static readonly Error NotFound = Error.NotFound(
         "User.NotFound",
         "The user with the requested ID was not found.");
