@@ -22,11 +22,12 @@ internal sealed class GetMessagesInDiscussionQueryHandler(IApplicationDbContext 
                 DateSentUtc = m.DateSentUtc,
                 IsEdited = m.IsEdited
             })
-            .OrderByDescending(m => m.DateSentUtc)
-            .ThenBy(m => m.Id)
-            .Where(m => m.DateSentUtc < request.LastDateSentUtc
-                    || (m.DateSentUtc == request.LastDateSentUtc && m.Id > request.LastMessageId))
-            .Take(request.Limit)
+            // TODO: implement pagination later
+            //.OrderByDescending(m => m.DateSentUtc)
+            //.ThenBy(m => m.Id)
+            //.Where(m => m.DateSentUtc < request.LastDateSentUtc
+            //        || (m.DateSentUtc == request.LastDateSentUtc && m.Id > request.LastMessageId))
+            //.Take(request.Limit)
             .ToListAsync(cancellationToken);
 
         return Result.Success(messages);
