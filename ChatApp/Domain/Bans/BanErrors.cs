@@ -12,6 +12,10 @@ public static class BanErrors
         "Ban.UserAlreadyBannedFromDiscussion",
         "The requested user has already been banned from the specified discussion.");
 
+    public static readonly Error NotFoundByUserId = Error.NotFound(
+        "Ban.NotFoundByUserId",
+        "A ban with the requested user ID that has not been unbanned was not found.");
+
     public static readonly Error NotFound = Error.NotFound(
         "Ban.NotFound",
         "The ban with the requested ID was not found.");

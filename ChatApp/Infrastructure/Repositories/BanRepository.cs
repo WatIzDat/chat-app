@@ -24,6 +24,13 @@ public sealed class BanRepository(ApplicationDbContext dbContext) : IBanReposito
             .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
     }
 
+    public async Task<Ban?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Bans
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.UserId == userId && b.IsUnbanned == false, cancellationToken);
+    }
+
     public void Insert(Ban ban)
     {
         dbContext.Set<Ban>().Add(ban);

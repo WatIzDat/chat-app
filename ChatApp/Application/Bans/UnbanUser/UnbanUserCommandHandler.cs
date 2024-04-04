@@ -12,11 +12,11 @@ internal sealed class UnbanUserCommandHandler(
 
     public async Task<Result> Handle(UnbanUserCommand request, CancellationToken cancellationToken)
     {
-        Ban? ban = await banRepository.GetByIdAsync(request.BanId, cancellationToken);
+        Ban? ban = await banRepository.GetByUserIdAsync(request.UserId, cancellationToken);
 
         if (ban == null)
         {
-            return Result.Failure(BanErrors.NotFound);
+            return Result.Failure(BanErrors.NotFoundByUserId);
         }
 
         Result result = ban.UnbanUser();

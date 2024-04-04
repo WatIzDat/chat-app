@@ -8,5 +8,7 @@ public interface IBanRepository
 
     Task<Ban?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
+    Task<Ban?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+
     Task<bool> BanExistsByUserAndDiscussionIdAsync(Guid userId, Guid discussionId, CancellationToken cancellationToken = default);
 }
