@@ -1,8 +1,10 @@
 ﻿using Application.Abstractions.Data;
+using Infrastructure.BackgroundJobs;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 
 namespace Infrastructure;
 
@@ -17,6 +19,15 @@ public static class DependencyInjection
         {
             options.UseNpgsql(connectionString, o => o.MigrationsAssembly("Infrastructure"));
         });
+
+        services.AddQuartz();
+
+        services.AddQuartzHostedService(options =>
+        {
+            options.WaitForJobsToComplete = true;
+        });
+
+        services.ConfigureOptions<UnbanUserBackgroundJobSetup>();
 
         return services;
     }

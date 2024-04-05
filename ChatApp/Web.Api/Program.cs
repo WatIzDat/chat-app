@@ -3,6 +3,8 @@ using Domain;
 using Infrastructure;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Scrutor;
 using Web.Api.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +15,13 @@ builder
         selector => selector
             .FromAssemblies(
                 InfrastructureAssemblyReference.Assembly)
+            .AddClasses(classes => classes.AssignableTo(typeof(IConfigureOptions<>)))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime()
             .AddClasses(false)
-            .AsImplementedInterfaces()
-            .WithScopedLifetime());
+                .UsingRegistrationStrategy(RegistrationStrategy.Skip)
+                .AsImplementedInterfaces()
+                .WithScopedLifetime());
 
 builder.Services.AddMediatR(options =>
 {
