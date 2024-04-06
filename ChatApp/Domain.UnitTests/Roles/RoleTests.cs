@@ -81,4 +81,12 @@ public class RoleTests
 
         Role.Permissions.Should().NotContain(Permission.BanUser);
     }
+
+    [Fact]
+    public void RemovePermission_Should_ReturnPermissionNotFound_WhenPermissionCouldNotBeRemoved()
+    {
+        Result result = Role.RemovePermission(Permission.MuteUser);
+
+        result.Error.Should().Be(RoleErrors.PermissionNotFound);
+    }
 }

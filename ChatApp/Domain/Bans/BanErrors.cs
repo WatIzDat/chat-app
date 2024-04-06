@@ -8,6 +8,10 @@ public static class BanErrors
         "Ban.CurrentTimeEarlierThanDateOfUnban",
         "The current time is earlier than the specified date of unban.");
 
+    public static readonly Error CurrentTimePastDateWillBeUnbanned = Error.Validation(
+        "Ban.CurrentTimePastDateWillBeUnbanned",
+        "The current time is past the specified date the user will be unbanned.");
+
     public static readonly Error UserAlreadyBannedFromDiscussion = Error.Conflict(
         "Ban.UserAlreadyBannedFromDiscussion",
         "The requested user has already been banned from the specified discussion.");

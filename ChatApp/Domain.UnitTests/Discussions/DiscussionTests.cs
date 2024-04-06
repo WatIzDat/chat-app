@@ -49,4 +49,12 @@ public class DiscussionTests
 
         result.Error.Should().Be(DiscussionErrors.NameTooLong);
     }
+
+    [Fact]
+    public void Delete_Should_SetIsDeletedToTrue()
+    {
+        Discussion.Delete();
+
+        Discussion.IsDeleted.Should().BeTrue();
+    }
 }

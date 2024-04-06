@@ -190,6 +190,27 @@ public class UserTests
     }
 
     [Fact]
+    public void AddRole_Should_ReturnTooManyRoles_WhenRolesCountIsGreaterThanDiscussionsCount()
+    {
+        User user = User.Create(
+            "test123",
+            Email.Create("test@test.com").Value,
+            DateTimeOffset.UtcNow,
+            AboutSection.Create("This is a test.").Value,
+            Discussions,
+            Roles).Value;
+
+        // Arrange
+        Guid roleId = Guid.NewGuid();
+
+        // Act
+        Result result = user.AddRole(roleId);
+
+        // Assert
+        result.Error.Should().Be(RolesListErrors.TooManyRoles);
+    }
+
+    [Fact]
     public void RemoveRole_Should_ReturnSuccess_And_RemoveRoleFromRolesList()
     {
         // Act
@@ -209,5 +230,15 @@ public class UserTests
 
         // Assert
         result.Error.Should().Be(UserErrors.RoleNotFound);
+    }
+
+    [Fact]
+    public void Delete_Should_SetIsDeletedToTrue()
+    {
+        // Act
+        User.Delete();
+
+        // Assert
+        User.IsDeleted.Should().BeTrue();
     }
 }

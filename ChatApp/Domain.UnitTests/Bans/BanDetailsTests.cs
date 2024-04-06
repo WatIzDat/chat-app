@@ -1,4 +1,5 @@
 ﻿using Domain.Bans;
+using SharedKernel;
 
 namespace Domain.UnitTests.Bans;
 
@@ -22,5 +23,15 @@ public class BanDetailsTests
 
         banDetails.IsBanPermanent.Should().BeTrue();
         banDetails.DateWillBeUnbannedUtc.Should().BeNull();
+    }
+
+    [Fact]
+    public void CreateTemporaryBan_Should_ReturnCurrentTimePastDateWillBeUnbanned_WhenCurrentTimeIsPastDateWillBeUnbanned()
+    {
+        Result result = BanDetails.CreateTemporaryBan(
+            DateTimeOffset.UtcNow.AddDays(1),
+            DateTimeOffset.UtcNow);
+
+        result.Error.Should().Be(BanErrors.CurrentTimePastDateWillBeUnbanned);
     }
 }

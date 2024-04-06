@@ -16,14 +16,14 @@ public sealed record BanDetails
 
     public DateTimeOffset? DateWillBeUnbannedUtc { get; }
 
-    public static Result<BanDetails> CreateTemporaryBan(DateTimeOffset currentTime, DateTimeOffset dateOfUnbanUtc)
+    public static Result<BanDetails> CreateTemporaryBan(DateTimeOffset currentTime, DateTimeOffset dateWillBeUnbanned)
     {
-        if (currentTime > dateOfUnbanUtc)
+        if (currentTime > dateWillBeUnbanned)
         {
-            return Result.Failure<BanDetails>(BanErrors.CurrentTimeEarlierThanDateOfUnban);
+            return Result.Failure<BanDetails>(BanErrors.CurrentTimePastDateWillBeUnbanned);
         }
 
-        BanDetails banDetails = new(isBanPermanent: false, dateOfUnbanUtc);
+        BanDetails banDetails = new(isBanPermanent: false, dateWillBeUnbanned);
 
         return Result.Success(banDetails);
     }
