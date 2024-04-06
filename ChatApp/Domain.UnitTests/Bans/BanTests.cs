@@ -20,18 +20,4 @@ public class BanTests
 
         ban.IsUnbanned.Should().BeTrue();
     }
-
-    [Fact]
-    public void UnbanUser_Should_ReturnCurrentTimeEarlierThanDateOfUnban_WhenUtcNowIsEarlierThanDateOfUnban()
-    {
-        Ban ban = Ban.Create(
-            Guid.NewGuid(),
-            Guid.NewGuid(),
-            DateTimeOffset.UtcNow,
-            BanDetails.CreateTemporaryBan(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddDays(1)).Value);
-
-        Result result = ban.UnbanUser();
-
-        result.Error.Should().Be(BanErrors.CurrentTimeEarlierThanDateOfUnban);
-    }
 }

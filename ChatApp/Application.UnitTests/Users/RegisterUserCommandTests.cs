@@ -25,6 +25,7 @@ public class RegisterUserCommandTests
     public async Task Handle_Should_ReturnSuccess()
     {
         userRepositoryMock.IsEmailUniqueAsync(Arg.Is(Email.Create(Command.Email).Value)).Returns(true);
+        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(Command.Username)).Returns(true);
 
         Result<Guid> result = await commandHandler.Handle(Command, default);
 
@@ -62,6 +63,8 @@ public class RegisterUserCommandTests
             "thisusernameiswaytoolong",
             Command.Email);
 
+        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(usernameTooLongCommand.Username)).Returns(true);
+
         Result<Guid> result = await commandHandler.Handle(usernameTooLongCommand, default);
 
         result.Error.Should().Be(UserErrors.UsernameTooLong);
@@ -71,6 +74,7 @@ public class RegisterUserCommandTests
     public async Task Handle_Should_CallUserRepositoryInsert()
     {
         userRepositoryMock.IsEmailUniqueAsync(Arg.Is(Email.Create(Command.Email).Value)).Returns(true);
+        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(Command.Username)).Returns(true);
 
         Result<Guid> result = await commandHandler.Handle(Command, default);
 

@@ -45,6 +45,7 @@ public class ChangeUsernameCommandTests
         ChangeUsernameCommand command = new(user.Id, "hello");
 
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(command.Username)).Returns(true);
 
         Result result = await commandHandler.Handle(command, default);
 
@@ -87,6 +88,7 @@ public class ChangeUsernameCommandTests
         ChangeUsernameCommand command = new(user.Id, "thisusernameiswaytoolong");
 
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(command.Username)).Returns(true);
 
         Result result = await commandHandler.Handle(command, default);
 
@@ -107,6 +109,7 @@ public class ChangeUsernameCommandTests
         ChangeUsernameCommand command = new(user.Id, "hello");
 
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(command.Username)).Returns(true);
 
         Result result = await commandHandler.Handle(command, default);
 
