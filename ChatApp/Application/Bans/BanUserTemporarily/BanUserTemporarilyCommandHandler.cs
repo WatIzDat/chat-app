@@ -35,7 +35,7 @@ internal sealed class BanUserTemporarilyCommandHandler(
             return Result.Failure<Guid>(DiscussionErrors.NotFound);
         }
 
-        Result<BanDetails> banDetailsResult = BanDetails.CreateTemporaryBan(dateTimeOffsetProvider.UtcNow, request.DateOfUnbanUtc);
+        Result<BanDetails> banDetailsResult = BanDetails.CreateTemporaryBan(dateTimeOffsetProvider.UtcNow, request.DateWillBeUnbannedUtc);
 
         if (banDetailsResult.IsFailure)
         {
