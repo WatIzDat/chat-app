@@ -18,7 +18,6 @@ public class BanUserPermanentlyCommandTests
     private readonly IDiscussionRepository discussionRepositoryMock;
     private readonly IDateTimeOffsetProvider dateTimeOffsetProviderMock;
 
-
     public BanUserPermanentlyCommandTests()
     {
         banRepositoryMock = Substitute.For<IBanRepository>();
