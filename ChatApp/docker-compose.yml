@@ -1,33 +1,41 @@
-version: '3.4'
+version: "3.4"
 
 services:
-  web.api:
-    image: ${DOCKER_REGISTRY-}webapi
-    container_name: web.api
-    build:
-      context: .
-      dockerfile: Web.Api/Dockerfile
-    ports:
-      - 8080:8080
-      - 8081:8081
+    web.api:
+        image: ${DOCKER_REGISTRY-}webapi
+        container_name: web.api
+        build:
+            context: .
+            dockerfile: Web.Api/Dockerfile
+        ports:
+            - 8080:8080
+            - 8081:8081
 
-  database.postgres:
-    image: postgres:latest
-    container_name: database.postgres
-    environment:
-      - POSTGRES_DB=chat_app
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    volumes:
-      - ./.containers/chat-app-db:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
+    database.postgres:
+        image: postgres:latest
+        container_name: database.postgres
+        environment:
+            - POSTGRES_DB=chat_app
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+        volumes:
+            - ./.containers/chat-app-db:/var/lib/postgresql/data
+        ports:
+            - 5432:5432
 
-  web.pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: web.pgadmin
-    ports:
-      - 5555:80
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=abc@def.com
-      - PGADMIN_DEFAULT_PASSWORD=password
+    web.svelte:
+        image: svelte:dev
+        build:
+            context: Web.Svelte/
+            dockerfile: Dockerfile
+        ports:
+            - 4173:4173
+
+    web.pgadmin:
+        image: dpage/pgadmin4:latest
+        container_name: web.pgadmin
+        ports:
+            - 5555:80
+        environment:
+            - PGADMIN_DEFAULT_EMAIL=abc@def.com
+            - PGADMIN_DEFAULT_PASSWORD=password
