@@ -23,13 +23,13 @@ services:
         ports:
             - 5432:5432
 
-    web.svelte:
-        image: svelte:dev
-        build:
-            context: Web.Svelte/
-            dockerfile: Dockerfile
-        ports:
-            - 4173:4173
+    # web.svelte:
+    #     image: svelte:dev
+    #     build:
+    #         context: Web.Svelte/
+    #         dockerfile: Dockerfile
+    #     ports:
+    #         - 4173:4173
 
     web.pgadmin:
         image: dpage/pgadmin4:latest
