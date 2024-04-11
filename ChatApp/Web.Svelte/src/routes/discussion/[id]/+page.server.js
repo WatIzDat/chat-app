@@ -1,4 +1,18 @@
+import { authUser } from '$lib/authStore';
+import { redirect } from '@sveltejs/kit';
+import { get } from 'svelte/store';
+
 export async function load({ params }) {
+	// const unsubscribe = authUser.subscribe((user) => {
+	// 	console.log(user);
+
+	// 	if (!user) {
+	// 		throw redirect(302, '/sign-in');
+	// 	}
+	// });
+
+	// unsubscribe();
+
 	const discussion = await getDiscussion(params);
 
 	console.log(discussion);

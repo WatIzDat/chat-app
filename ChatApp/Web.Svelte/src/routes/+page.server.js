@@ -1,12 +1,12 @@
-import { getAuth } from 'firebase/auth';
+// import { getAuth } from 'firebase/auth';
 
-export async function load(event) {
-	const auth = getAuth(event.locals.firebaseApp);
-	const user = auth.currentUser;
+// export async function load(event) {
+// 	const auth = getAuth(event.locals.firebaseApp);
+// 	const user = auth.currentUser;
 
-	if (user) {
-		return { name: user.displayName };
-	} else {
-		return { name: 'no name' };
-	}
-}
+// 	if (user) {
+// 		return { name: user.displayName };
+// 	} else {
+// 		return { name: 'no name' };
+// 	}
+// }

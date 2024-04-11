@@ -1,20 +1,10 @@
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { redirect } from '@sveltejs/kit';
+// import { redirect } from '@sveltejs/kit';
+// import { signIn } from '$lib/auth';
 
-let firebaseApp;
+// export const actions = {
+// 	default: async ({ cookies, request }) => {
+// 		await signIn(request);
 
-export async function load(event) {
-	firebaseApp = event.locals.firebaseApp;
-}
-
-export const actions = {
-	default: async ({ cookies, request }) => {
-		const auth = getAuth(firebaseApp);
-
-		const data = await request.formData();
-
-		await signInWithEmailAndPassword(auth, data.get('email'), data.get('password'));
-
-		throw redirect(303, '/');
-	}
-};
+// 		throw redirect(303, '/');
+// 	}
+// };
