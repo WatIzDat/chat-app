@@ -4,7 +4,7 @@ using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
-namespace Application.Users.GetUserById;
+namespace Application.Users.GetUserByClerkId;
 
 internal sealed class GetUserByClerkIdQueryHandler(IApplicationDbContext dbContext)
     : IQueryHandler<GetUserByClerkIdQuery, UserResponse>

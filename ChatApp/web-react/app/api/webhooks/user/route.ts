@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     if (eventType === "user.deleted") {
         const response = await fetch(
-            `http://localhost:8080/users/delete-user?userId=${id}`,
+            `http://localhost:8080/users/delete-user-by-clerk-id?clerkId=${id}`,
             {
                 method: "DELETE",
             }

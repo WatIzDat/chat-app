@@ -12,7 +12,14 @@ public sealed class UserRepository(ApplicationDbContext dbContext) : IUserReposi
     {
         return await dbContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Id == id && u.IsDeleted == false, cancellationToken);
+    }
+
+    public async Task<User?> GetByClerkIdAsync(string clerkId, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.ClerkId == clerkId && u.IsDeleted == false, cancellationToken);
     }
 
     public void Insert(User user)
@@ -46,6 +53,6 @@ public sealed class UserRepository(ApplicationDbContext dbContext) : IUserReposi
     public async Task<bool> UserExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await dbContext.Users
-            .AnyAsync(u => u.Id == id, cancellationToken);
+            .AnyAsync(u => u.Id == id && u.IsDeleted == false, cancellationToken);
     }
 }

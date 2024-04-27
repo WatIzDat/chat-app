@@ -3,7 +3,8 @@ using Application.Users.AddRole;
 using Application.Users.ChangeEmail;
 using Application.Users.ChangeUsername;
 using Application.Users.DeleteUser;
-using Application.Users.GetUserById;
+using Application.Users.DeleteUserByClerkId;
+using Application.Users.GetUserByClerkId;
 using Application.Users.GetUsersByDiscussionIdAndRoleId;
 using Application.Users.GetUsersWithNoRoleByDiscussionId;
 using Application.Users.JoinDiscussion;
@@ -58,6 +59,18 @@ public sealed class UsersController(ISender sender) : ApiController(sender)
         CancellationToken cancellationToken)
     {
         DeleteUserCommand command = new(userId);
+
+        Result result = await Sender.Send(command, cancellationToken);
+
+        return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
+    }
+
+    [HttpDelete("delete-user-by-clerk-id")]
+    public async Task<IResult> DeleteUserByClerkId(
+        [FromQuery] string clerkId,
+        CancellationToken cancellationToken)
+    {
+        DeleteUserByClerkIdCommand command = new(clerkId);
 
         Result result = await Sender.Send(command, cancellationToken);
 

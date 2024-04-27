@@ -8,6 +8,8 @@ public interface IUserRepository
 
     Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
+    Task<User?> GetByClerkIdAsync(string clerkId, CancellationToken cancellationToken = default);
+
     Task<bool> IsEmailUniqueAsync(Email email, CancellationToken cancellationToken = default);
 
     Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken = default);

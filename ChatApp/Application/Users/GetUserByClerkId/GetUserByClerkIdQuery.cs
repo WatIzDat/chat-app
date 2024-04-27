@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
 using Domain.Users;
 
-namespace Application.Users.GetUserById;
+namespace Application.Users.GetUserByClerkId;
 
 public sealed record GetUserByClerkIdQuery(string ClerkId) : IQuery<UserResponse>;
