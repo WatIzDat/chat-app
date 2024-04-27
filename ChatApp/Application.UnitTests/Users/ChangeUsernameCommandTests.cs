@@ -19,7 +19,8 @@ public class ChangeUsernameCommandTests
             DateTimeOffset.UtcNow,
             AboutSection.Create("This is a test.").Value,
             Discussions,
-            Roles).Value;
+            Roles,
+            "test").Value;
 
     private readonly ChangeUsernameCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
@@ -40,7 +41,8 @@ public class ChangeUsernameCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         ChangeUsernameCommand command = new(user.Id, "hello");
 
@@ -63,7 +65,8 @@ public class ChangeUsernameCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         ChangeUsernameCommand command = new(user.Id, "hello");
 
@@ -83,7 +86,8 @@ public class ChangeUsernameCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         ChangeUsernameCommand command = new(user.Id, "thisusernameiswaytoolong");
 
@@ -104,7 +108,8 @@ public class ChangeUsernameCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         ChangeUsernameCommand command = new(user.Id, "hello");
 

@@ -1,8 +1,16 @@
 import { Webhook } from "svix";
-import { headers } from "next/headers";
-import { WebhookEvent, currentUser } from "@clerk/nextjs/server";
+import { cookies, headers } from "next/headers";
+import {
+    WebhookEvent,
+    auth,
+    clerkClient,
+    currentUser,
+} from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
+import { useClerk } from "@clerk/nextjs";
+import { NextRequest } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 
     if (!WEBHOOK_SECRET) {
@@ -48,7 +56,16 @@ export async function POST(req: Request) {
     console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
     console.log("Webhook body:", body);
 
-    if (eventType === "user.created") {
+    if (eventType === "user.deleted") {
+        const response = await fetch(
+            `http://localhost:8080/users/delete-user?userId=${id}`,
+            {
+                method: "DELETE",
+            }
+        );
+
+        console.log(response);
+    } else if (eventType === "user.created") {
         const user = JSON.parse(body).data;
 
         // console.log(user);
@@ -56,6 +73,7 @@ export async function POST(req: Request) {
         const data = {
             username: user.username,
             email: user.email_addresses[0].email_address,
+            clerkId: id,
         };
 
         console.log(data);

@@ -7,7 +7,7 @@ namespace Application.UnitTests.Users;
 public class RegisterUserCommandTests
 {
     private static readonly RegisterUserCommand Command = new(
-        "Full name", "test@test.com");
+        "Full name", "test@test.com", "test");
 
     private readonly RegisterUserCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
@@ -37,7 +37,8 @@ public class RegisterUserCommandTests
     {
         RegisterUserCommand invalidEmailCommand = new(
             Command.Username,
-            "thisisaninvalidemail");
+            "thisisaninvalidemail",
+            "test");
 
         Result<Guid> result = await commandHandler.Handle(invalidEmailCommand, default);
 
@@ -61,7 +62,8 @@ public class RegisterUserCommandTests
 
         RegisterUserCommand usernameTooLongCommand = new(
             "thisusernameiswaytoolong",
-            Command.Email);
+            Command.Email,
+            "test");
 
         userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(usernameTooLongCommand.Username)).Returns(true);
 

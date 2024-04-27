@@ -21,7 +21,8 @@ public class LeaveDiscussionCommandTests
             DateTimeOffset.UtcNow,
             AboutSection.Create("This is a test.").Value,
             Discussions,
-            Roles).Value;
+            Roles,
+            "test").Value;
 
     private readonly LeaveDiscussionCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
@@ -42,7 +43,8 @@ public class LeaveDiscussionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         LeaveDiscussionCommand command = new(user.Id, DiscussionId);
 
@@ -64,7 +66,8 @@ public class LeaveDiscussionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         LeaveDiscussionCommand command = new(user.Id, DiscussionId);
 
@@ -84,7 +87,8 @@ public class LeaveDiscussionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         LeaveDiscussionCommand command = new(user.Id, DiscussionId);
 
@@ -108,7 +112,8 @@ public class LeaveDiscussionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         LeaveDiscussionCommand command = new(user.Id, DiscussionId);
 

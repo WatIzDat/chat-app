@@ -3,6 +3,7 @@ using Application.Users.AddRole;
 using Application.Users.ChangeEmail;
 using Application.Users.ChangeUsername;
 using Application.Users.DeleteUser;
+using Application.Users.GetUserById;
 using Application.Users.GetUsersByDiscussionIdAndRoleId;
 using Application.Users.GetUsersWithNoRoleByDiscussionId;
 using Application.Users.JoinDiscussion;
@@ -61,6 +62,18 @@ public sealed class UsersController(ISender sender) : ApiController(sender)
         Result result = await Sender.Send(command, cancellationToken);
 
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
+    }
+
+    [HttpGet("get-user-by-clerk-id")]
+    public async Task<IResult> GetUserByClerkId(
+        [FromQuery] string clerkId,
+        CancellationToken cancellationToken)
+    {
+        GetUserByClerkIdQuery query = new(clerkId);
+
+        Result<UserResponse> result = await Sender.Send(query, cancellationToken);
+
+        return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
     }
 
     [HttpGet("get-users-by-discussion-id-and-role-id")]

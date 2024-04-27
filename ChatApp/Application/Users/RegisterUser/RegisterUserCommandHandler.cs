@@ -71,7 +71,8 @@ internal sealed class RegisterUserCommandHandler(
             dateTimeOffsetProvider.UtcNow,
             aboutSection,
             discussions,
-            roles);
+            roles,
+            request.ClerkId);
 
         if (userResult.IsFailure)
         {

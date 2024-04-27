@@ -1,29 +1,46 @@
-import { UserButton } from "@clerk/nextjs";
-import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
+"use client";
 
-export default function Navbar() {
-    const { userId } = auth();
+import {
+    SignInButton,
+    SignUpButton,
+    SignedIn,
+    SignedOut,
+    UserButton,
+} from "@clerk/nextjs";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { fetchUserById } from "../lib/data";
 
-    console.log(userId);
+export default async function Navbar() {
+    // console.log(auth());
+
+    // let isSignedIn = null;
+
+    // try {
+    //     // const user = await currentUser();
+    //     const { userId } = auth();
+
+    //     if (userId) {
+    //         const user = await fetchUserById(userId);
+
+    //         if (user === null) {
+    //             isSignedIn = false;
+    //         }
+    //     }
+    // } catch (error) {
+    //     isSignedIn = false;
+    // }
 
     return (
         <div className="flex flex-row grow justify-start px-8 py-4 text-2xl">
-            {!userId && (
-                <>
-                    <Link className="ml-auto" href="/sign-in">
-                        Sign In
-                    </Link>
-                    <Link className="ml-8" href="/sign-up">
-                        Sign Up
-                    </Link>
-                </>
-            )}
-            {userId && (
-                <div className="ml-auto">
-                    <UserButton />
-                </div>
-            )}
+            <SignedOut>
+                <SignInButton mode="modal" />
+                <SignUpButton mode="modal" />
+                <p>another test</p>
+            </SignedOut>
+            <SignedIn>
+                <UserButton afterSignOutUrl="/" />
+                <p>test</p>
+            </SignedIn>
         </div>
     );
 }

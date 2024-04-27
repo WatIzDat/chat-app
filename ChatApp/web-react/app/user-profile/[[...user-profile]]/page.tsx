@@ -1,9 +1,9 @@
-import { SignIn } from "@clerk/nextjs";
+import { UserProfile } from "@clerk/nextjs";
 
 export default function Page() {
     return (
         <div className="flex items-center justify-center h-screen">
-            <SignIn forceRedirectUrl="/" />
+            <UserProfile path="/user-profile" />
         </div>
     );
 }

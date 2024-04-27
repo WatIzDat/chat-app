@@ -18,7 +18,8 @@ public class UserTests
             DateTimeOffset.UtcNow,
             AboutSection.Create("This is a test.").Value,
             Discussions,
-            Roles).Value;
+            Roles,
+            "test").Value;
 
     [Fact]
     public void Create_Should_ReturnSuccess()
@@ -30,7 +31,8 @@ public class UserTests
             DateTimeOffset.UtcNow,
             User.AboutSection,
             Discussions,
-            Roles);
+            Roles,
+            "test");
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -46,7 +48,8 @@ public class UserTests
             DateTimeOffset.UtcNow,
             User.AboutSection,
             Discussions,
-            Roles);
+            Roles,
+            "test");
 
         // Assert
         result.Error.Should().Be(UserErrors.UsernameTooLong);
@@ -198,7 +201,8 @@ public class UserTests
             DateTimeOffset.UtcNow,
             AboutSection.Create("This is a test.").Value,
             Discussions,
-            Roles).Value;
+            Roles,
+            "test").Value;
 
         // Arrange
         Guid roleId = Guid.NewGuid();

@@ -19,7 +19,8 @@ public class DeleteUserCommandTests
             DateTimeOffset.UtcNow,
             AboutSection.Create("This is a test.").Value,
             Discussions,
-            Roles).Value;
+            Roles,
+            "test").Value;
 
     private readonly DeleteUserCommmandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
@@ -40,7 +41,8 @@ public class DeleteUserCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         DeleteUserCommand command = new(user.Id);
 
@@ -62,7 +64,8 @@ public class DeleteUserCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         DeleteUserCommand command = new(user.Id);
 
@@ -82,7 +85,8 @@ public class DeleteUserCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         DeleteUserCommand command = new(user.Id);
 

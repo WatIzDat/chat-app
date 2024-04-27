@@ -23,7 +23,8 @@ public sealed class User : Entity
         AboutSection aboutSection,
         DiscussionsList discussions,
         RolesList roles,
-        bool isDeleted)
+        bool isDeleted,
+        string clerkId)
         : base(id)
     {
         Username = username;
@@ -33,6 +34,7 @@ public sealed class User : Entity
         Discussions = discussions;
         Roles = roles;
         IsDeleted = isDeleted;
+        ClerkId = clerkId;
     }
 
     public string Username { get; private set; }
@@ -49,6 +51,8 @@ public sealed class User : Entity
 
     public bool IsDeleted { get; private set; }
 
+    public string ClerkId { get; private set; }
+
     // Navigation property for EF
     public ICollection<Discussion> DiscussionsNavigation { get; set; } = null!;
 
@@ -64,14 +68,15 @@ public sealed class User : Entity
         DateTimeOffset dateCreatedUtc,
         AboutSection aboutSection,
         DiscussionsList discussions,
-        RolesList roles)
+        RolesList roles,
+        string clerkId)
     {
         if (username.Length > UsernameMaxLength)
         {
             return Result.Failure<User>(UserErrors.UsernameTooLong);
         }
 
-        User user = new(Guid.NewGuid(), username, email, dateCreatedUtc, aboutSection, discussions, roles, isDeleted: false);
+        User user = new(Guid.NewGuid(), username, email, dateCreatedUtc, aboutSection, discussions, roles, isDeleted: false, clerkId);
 
         return Result.Success(user);
     }

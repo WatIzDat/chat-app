@@ -58,6 +58,10 @@ internal class UserEntityConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("is_deleted");
 
         builder
+            .Property(u => u.ClerkId)
+            .HasColumnName("clerk_id");
+
+        builder
             .HasIndex(u => u.Username)
             .IsUnique()
             .HasFilter("is_deleted = FALSE");

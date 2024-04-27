@@ -19,7 +19,8 @@ public class UpdateAboutSectionCommandTests
             DateTimeOffset.UtcNow,
             AboutSection.Create("This is a test.").Value,
             Discussions,
-            Roles).Value;
+            Roles,
+            "test").Value;
 
     private readonly UpdateAboutSectionCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
@@ -40,7 +41,8 @@ public class UpdateAboutSectionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         UpdateAboutSectionCommand command = new(user.Id, "new about section");
 
@@ -62,7 +64,8 @@ public class UpdateAboutSectionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         UpdateAboutSectionCommand command = new(user.Id, "new about section");
 
@@ -82,7 +85,8 @@ public class UpdateAboutSectionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         string aboutSection = string.Empty;
 
@@ -109,7 +113,8 @@ public class UpdateAboutSectionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         UpdateAboutSectionCommand command = new(user.Id, "new about section");
 

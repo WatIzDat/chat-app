@@ -22,7 +22,8 @@ public class AddRoleCommandTests
             DateTimeOffset.UtcNow,
             AboutSection.Create("This is a test.").Value,
             Discussions,
-            Roles).Value;
+            Roles,
+            "test").Value;
 
     private readonly AddRoleCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
@@ -45,7 +46,8 @@ public class AddRoleCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         AddRoleCommand command = new(user.Id, RoleId);
         
@@ -67,7 +69,8 @@ public class AddRoleCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         AddRoleCommand command = new(user.Id, RoleId);
 
@@ -89,7 +92,8 @@ public class AddRoleCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         AddRoleCommand command = new(user.Id, RoleId);
 
@@ -111,7 +115,8 @@ public class AddRoleCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         AddRoleCommand command = new(user.Id, RoleId);
 
@@ -133,7 +138,8 @@ public class AddRoleCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         AddRoleCommand command = new(user.Id, user.Roles.Value[0]);
 
@@ -155,7 +161,8 @@ public class AddRoleCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            RolesList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value).Value;
+            RolesList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value,
+            User.ClerkId).Value;
 
         AddRoleCommand command = new(user.Id, RoleId);
 
@@ -177,7 +184,8 @@ public class AddRoleCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         AddRoleCommand command = new(user.Id, RoleId);
 

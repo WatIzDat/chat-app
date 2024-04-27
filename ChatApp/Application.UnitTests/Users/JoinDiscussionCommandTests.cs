@@ -22,7 +22,8 @@ public class JoinDiscussionCommandTests
             DateTimeOffset.UtcNow,
             AboutSection.Create("This is a test.").Value,
             Discussions,
-            Roles).Value;
+            Roles,
+            "test").Value;
 
     private readonly JoinDiscussionCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
@@ -45,7 +46,8 @@ public class JoinDiscussionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         JoinDiscussionCommand command = new(user.Id, DiscussionId);
         
@@ -66,7 +68,8 @@ public class JoinDiscussionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         JoinDiscussionCommand command = new(user.Id, DiscussionId);
 
@@ -87,7 +90,8 @@ public class JoinDiscussionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         JoinDiscussionCommand command = new(user.Id, DiscussionId);
 
@@ -108,7 +112,8 @@ public class JoinDiscussionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         JoinDiscussionCommand command = new(user.Id, user.Discussions.Value[0]);
 
@@ -129,7 +134,8 @@ public class JoinDiscussionCommandTests
             User.DateCreatedUtc,
             User.AboutSection,
             User.Discussions,
-            User.Roles).Value;
+            User.Roles,
+            User.ClerkId).Value;
 
         JoinDiscussionCommand command = new(user.Id, DiscussionId);
 
