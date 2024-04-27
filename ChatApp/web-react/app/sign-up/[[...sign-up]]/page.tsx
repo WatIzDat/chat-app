@@ -2,8 +2,10 @@ import { SignUp } from "@clerk/nextjs";
 
 export default function Page() {
     return (
-        <div className="flex items-center justify-center h-screen">
-            <SignUp forceRedirectUrl="/" />
-        </div>
+        <main className="h-full">
+            <div className="flex items-center justify-center h-full">
+                <SignUp />
+            </div>
+        </main>
     );
 }

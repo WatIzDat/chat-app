@@ -19,12 +19,12 @@ export default function RootLayout({
     return (
         <ClerkProvider>
             <html lang="en">
-                <body className={inter.className}>
-                    <header>
-                        <Navbar />
-                    </header>
+                <body
+                    className={`${inter.className} h-[calc(100vh-theme('spacing.8'))]`}
+                >
+                    <Navbar />
 
-                    <main>{children}</main>
+                    {children}
                 </body>
             </html>
         </ClerkProvider>

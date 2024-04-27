@@ -1,13 +1,6 @@
 import { Webhook } from "svix";
-import { cookies, headers } from "next/headers";
-import {
-    WebhookEvent,
-    auth,
-    clerkClient,
-    currentUser,
-} from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
-import { useClerk } from "@clerk/nextjs";
+import { headers } from "next/headers";
+import { WebhookEvent } from "@clerk/nextjs/server";
 import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
