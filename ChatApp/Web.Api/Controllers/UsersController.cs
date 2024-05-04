@@ -16,11 +16,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SharedKernel;
-using Svix;
-using System.Net;
 using System.Text;
 using Web.Api.Abstractions;
-using Web.Api.Auth;
 using Web.Api.Extensions;
 using Web.Api.Mappings;
 using Web.Api.Utility;
@@ -172,15 +169,9 @@ public sealed class UsersController(ISender sender) : ApiController(sender)
     {
         string body;
 
-        try
+        using (StreamReader reader = new(Request.Body, Encoding.UTF8))
         {
-            using StreamReader reader = new(Request.Body, Encoding.UTF8);
-
             body = await reader.ReadToEndAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            return Results.BadRequest(ex.Message);
         }
 
         IResult? verifyWebhookResult = WebhookUtility.VerifyWebhook(body, HttpContext, Request);
@@ -194,7 +185,7 @@ public sealed class UsersController(ISender sender) : ApiController(sender)
 
         RegisterUserCommand command = new(
             user.Data.Username,
-            user.Data.Email_Addresses[0].Email_Address,
+            user.Data.EmailAddresses.First(e => e.Id == user.Data.PrimaryEmailAddressId).EmailAddress,
             user.Data.Id);
 
         Result<Guid> result = await Sender.Send(command, cancellationToken);

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Svix;
+﻿using Svix;
 using System.Net;
 
 namespace Web.Api.Utility
@@ -27,14 +26,6 @@ namespace Web.Api.Utility
             headers.Set("svix-id", svixId);
             headers.Set("svix-timestamp", svixTimestamp);
             headers.Set("svix-signature", svixSignature);
-
-            //string body = JsonConvert.SerializeObject(payload);
-            //string body;
-
-            //using (StreamReader reader = new(request.Body))
-            //{
-            //    body = await reader.ReadToEndAsync();
-            //}
 
             Webhook webhook = new(webhookSecret);
 

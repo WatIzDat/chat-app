@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Web.Api.Mappings;
 
@@ -12,27 +12,18 @@ public class RegisterUserWebhookMapping
 
         public string Username { get; set; }
 
-        [JsonPropertyName("email_addresses")]
-        public EmailAddressMapping[] Email_Addresses { get; set; }
+        [JsonProperty("email_addresses")]
+        public EmailAddressMapping[] EmailAddresses { get; set; }
 
-        [JsonPropertyName("primary_email_address_id")]
+        [JsonProperty("primary_email_address_id")]
         public string PrimaryEmailAddressId { get; set; }
 
         public class EmailAddressMapping
         {
-            [JsonPropertyName("email_address")]
-            public string Email_Address { get; set; }
+            [JsonProperty("email_address")]
+            public string EmailAddress { get; set; }
             
             public string Id { get; set; }
         }
     }
 }
-
-//public class RegisterUserWebhookData
-//{
-//    public string Id { get; set; }
-
-//    public string Username { get; set; }
-
-//    public string[] EmailAddresses { get; set; }
-//}
