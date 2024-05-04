@@ -1,6 +1,6 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { WebhookEvent } from "@clerk/nextjs/server";
+import { WebhookEvent, auth } from "@clerk/nextjs/server";
 import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -50,40 +50,44 @@ export async function POST(req: NextRequest) {
     console.log("Webhook body:", body);
 
     if (eventType === "user.deleted") {
-        const response = await fetch(
-            `http://localhost:8080/users/delete-user-by-clerk-id?clerkId=${id}`,
-            {
-                method: "DELETE",
-            }
-        );
-
-        console.log(response);
-    } else if (eventType === "user.created") {
-        const user = JSON.parse(body).data;
-
-        // console.log(user);
-
-        const data = {
-            username: user.username,
-            email: user.email_addresses[0].email_address,
-            clerkId: id,
-        };
-
-        console.log(data);
-
-        const response = await fetch(
-            "http://localhost:8080/users/register-user",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            }
-        );
-
-        console.log(response);
+        console.log(await auth().getToken());
     }
+
+    // if (eventType === "user.deleted") {
+    //     const response = await fetch(
+    //         `http://localhost:8080/users/delete-user-by-clerk-id?clerkId=${id}`,
+    //         {
+    //             method: "DELETE",
+    //         }
+    //     );
+
+    //     console.log(response);
+    // } else if (eventType === "user.created") {
+    //     const user = JSON.parse(body).data;
+
+    //     // console.log(user);
+
+    //     const data = {
+    //         username: user.username,
+    //         email: user.email_addresses[0].email_address,
+    //         clerkId: id,
+    //     };
+
+    //     console.log(data);
+
+    //     const response = await fetch(
+    //         "http://localhost:8080/users/register-user",
+    //         {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify(data),
+    //         }
+    //     );
+
+    //     console.log(response);
+    // }
 
     return new Response("", { status: 200 });
 }

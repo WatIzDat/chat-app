@@ -1,14 +1,10 @@
-import { unstable_noStore as noStore } from "next/cache";
-
 export async function fetchUserById(id: string) {
-    noStore();
-
     try {
         const response = await fetch(
             `http://localhost:8080/users/get-user-by-clerk-id?clerkId=${id}`
         );
 
-        console.log(response);
+        // console.log(response);
 
         if (response.status === 404) {
             return null;

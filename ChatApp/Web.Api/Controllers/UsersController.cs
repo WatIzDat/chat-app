@@ -14,9 +14,16 @@ using Application.Users.RemoveRole;
 using Application.Users.UpdateAboutSection;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SharedKernel;
+using Svix;
+using System.Net;
+using System.Text;
 using Web.Api.Abstractions;
+using Web.Api.Auth;
 using Web.Api.Extensions;
+using Web.Api.Mappings;
+using Web.Api.Utility;
 
 namespace Web.Api.Controllers;
 
@@ -155,6 +162,41 @@ public sealed class UsersController(ISender sender) : ApiController(sender)
         [FromBody] RegisterUserCommand command,
         CancellationToken cancellationToken)
     {
+        Result<Guid> result = await Sender.Send(command, cancellationToken);
+
+        return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
+    }
+
+    [HttpPost("/webhook/register-user")]
+    public async Task<IResult> RegisterUserWebhook(CancellationToken cancellationToken)
+    {
+        string body;
+
+        try
+        {
+            using StreamReader reader = new(Request.Body, Encoding.UTF8);
+
+            body = await reader.ReadToEndAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
+
+        IResult? verifyWebhookResult = WebhookUtility.VerifyWebhook(body, HttpContext, Request);
+
+        if (verifyWebhookResult != null)
+        {
+            return verifyWebhookResult;
+        }
+
+        RegisterUserWebhookMapping user = JsonConvert.DeserializeObject<RegisterUserWebhookMapping>(body)!;
+
+        RegisterUserCommand command = new(
+            user.Data.Username,
+            user.Data.Email_Addresses[0].Email_Address,
+            user.Data.Id);
+
         Result<Guid> result = await Sender.Send(command, cancellationToken);
 
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
