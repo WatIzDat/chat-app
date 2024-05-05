@@ -81,6 +81,26 @@ public sealed class UsersController(ISender sender) : ApiController(sender)
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
+    [HttpPost("/webhook/delete-user")]
+    public async Task<IResult> DeleteUserWebhook(CancellationToken cancellationToken)
+    {
+        return await WebhookUtility.VerifyWebhookAsync(
+            HttpContext,
+            Request,
+            "WebhookSecrets:DeleteUserSecret",
+            onSuccess: async body =>
+            {
+                DeleteUserWebhookMapping user = JsonConvert.DeserializeObject<DeleteUserWebhookMapping>(body)!;
+
+                DeleteUserByClerkIdCommand command = new(user.Data.Id);
+
+                Result result = await Sender.Send(command, cancellationToken);
+
+                return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
+            },
+            cancellationToken);
+    }
+
     [HttpGet("get-user-by-clerk-id")]
     public async Task<IResult> GetUserByClerkId(
         [FromQuery] string clerkId,
@@ -167,30 +187,24 @@ public sealed class UsersController(ISender sender) : ApiController(sender)
     [HttpPost("/webhook/register-user")]
     public async Task<IResult> RegisterUserWebhook(CancellationToken cancellationToken)
     {
-        string body;
+        return await WebhookUtility.VerifyWebhookAsync(
+            HttpContext,
+            Request,
+            "WebhookSecrets:RegisterUserSecret",
+            onSuccess: async body =>
+            {
+                RegisterUserWebhookMapping user = JsonConvert.DeserializeObject<RegisterUserWebhookMapping>(body)!;
 
-        using (StreamReader reader = new(Request.Body, Encoding.UTF8))
-        {
-            body = await reader.ReadToEndAsync(cancellationToken);
-        }
+                RegisterUserCommand command = new(
+                    user.Data.Username,
+                    user.Data.EmailAddresses.First(e => e.Id == user.Data.PrimaryEmailAddressId).EmailAddress,
+                    user.Data.Id);
 
-        IResult? verifyWebhookResult = WebhookUtility.VerifyWebhook(body, HttpContext, Request);
+                Result<Guid> result = await Sender.Send(command, cancellationToken);
 
-        if (verifyWebhookResult != null)
-        {
-            return verifyWebhookResult;
-        }
-
-        RegisterUserWebhookMapping user = JsonConvert.DeserializeObject<RegisterUserWebhookMapping>(body)!;
-
-        RegisterUserCommand command = new(
-            user.Data.Username,
-            user.Data.EmailAddresses.First(e => e.Id == user.Data.PrimaryEmailAddressId).EmailAddress,
-            user.Data.Id);
-
-        Result<Guid> result = await Sender.Send(command, cancellationToken);
-
-        return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
+                return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
+            },
+            cancellationToken);
     }
 
     [HttpPost("remove-role")]
