@@ -1,4 +1,5 @@
 using Application;
+using Clerk.Net.DependencyInjection;
 using Domain;
 using Infrastructure;
 using Infrastructure.Data;
@@ -37,6 +38,11 @@ builder
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+builder.Services.AddClerkApiClient(options =>
+{
+    options.SecretKey = builder.Configuration["Clerk:SecretKey"]!;
+});
 
 builder.Services.AddControllers();
 

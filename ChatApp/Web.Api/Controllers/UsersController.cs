@@ -12,11 +12,12 @@ using Application.Users.LeaveDiscussion;
 using Application.Users.RegisterUser;
 using Application.Users.RemoveRole;
 using Application.Users.UpdateAboutSection;
+using Clerk.Net.Client;
+using Clerk.Net.Client.Users.Item;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SharedKernel;
-using System.Text;
 using Web.Api.Abstractions;
 using Web.Api.Extensions;
 using Web.Api.Mappings;
@@ -25,8 +26,10 @@ using Web.Api.Utility;
 namespace Web.Api.Controllers;
 
 [Route("users")]
-public sealed class UsersController(ISender sender) : ApiController(sender)
+public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClient) : ApiController(sender)
 {
+    private readonly ClerkApiClient clerkApiClient = clerkApiClient;
+
     [HttpPost("add-role")]
     public async Task<IResult> AddRole(
         [FromBody] AddRoleCommand command,
@@ -202,7 +205,19 @@ public sealed class UsersController(ISender sender) : ApiController(sender)
 
                 Result<Guid> result = await Sender.Send(command, cancellationToken);
 
-                return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
+                if (result.IsFailure)
+                {
+                    return result.ToProblemDetails();
+                }
+
+                WithUser_PatchRequestBody patchRequestBody = new()
+                {
+                    ExternalId = result.Value.ToString()
+                };
+
+                await clerkApiClient.Users[user.Data.Id].PatchAsync(patchRequestBody, cancellationToken: cancellationToken);
+
+                return Results.Ok(result.Value);
             },
             cancellationToken);
     }
