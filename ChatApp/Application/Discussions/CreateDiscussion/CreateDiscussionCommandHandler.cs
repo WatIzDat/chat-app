@@ -19,7 +19,7 @@ internal sealed class CreateDiscussionCommandHandler(
     {
         // TODO: Add limit to amount of discussions a single user can create
 
-        if (!await userRepository.UserExistsAsync(request.UserId))
+        if (!await userRepository.UserExistsAsync(request.UserId, cancellationToken))
         {
             return Result.Failure<Guid>(UserErrors.NotFound);
         }
