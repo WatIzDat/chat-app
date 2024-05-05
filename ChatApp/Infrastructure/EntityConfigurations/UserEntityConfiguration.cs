@@ -18,7 +18,7 @@ internal class UserEntityConfiguration : IEntityTypeConfiguration<User>
 
         builder
             .Property(u => u.Username)
-            .HasMaxLength(20)
+            .HasMaxLength(64)
             .HasColumnName("username");
 
         builder
