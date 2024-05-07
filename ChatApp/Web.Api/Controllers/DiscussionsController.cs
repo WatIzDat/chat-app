@@ -3,6 +3,7 @@ using Application.Discussions.CreateDiscussion;
 using Application.Discussions.DeleteDiscussion;
 using Application.Discussions.EditName;
 using Application.Discussions.GetCreatedDiscussionsByUser;
+using Application.Discussions.GetDiscussionById;
 using Application.Discussions.GetJoinedDiscussionsByUser;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -55,6 +56,18 @@ public sealed class DiscussionsController(ISender sender) : ApiController(sender
         GetCreatedDiscussionsByUserQuery query = new(userId);
 
         Result<List<DiscussionResponse>> result = await Sender.Send(query, cancellationToken);
+
+        return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
+    }
+
+    [HttpGet("get-discussion-by-id")]
+    public async Task<IResult> GetDiscussionById(
+        [FromQuery] Guid id,
+        CancellationToken cancellationToken)
+    {
+        GetDiscussionByIdQuery query = new(id);
+
+        Result<DiscussionResponse> result = await Sender.Send(query, cancellationToken);
 
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
     }
