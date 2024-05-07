@@ -1,6 +1,9 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import useSWR, { useSWRConfig } from "swr";
 import { z } from "zod";
 
 const CreateDiscussion = z.object({
@@ -8,6 +11,8 @@ const CreateDiscussion = z.object({
 });
 
 export async function createDiscussion(formData: FormData) {
+    // const { mutate } = useSWRConfig();
+
     const { name } = CreateDiscussion.parse({
         name: formData.get("name"),
     });
@@ -30,6 +35,8 @@ export async function createDiscussion(formData: FormData) {
     const result = await response.json();
 
     console.log(result);
+
+    // mutate("/api/my-discussions");
 
     // console.log(name);
     // console.log(auth().sessionClaims?.userId);
