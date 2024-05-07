@@ -6,20 +6,22 @@ using SharedKernel;
 namespace Application.Discussions.CreateDiscussion;
 
 internal sealed class CreateDiscussionCommandHandler(
-    IDiscussionRepository discussionRepository,
     IUserRepository userRepository,
-    IDateTimeOffsetProvider dateTimeOffsetProvider)
+    IDateTimeOffsetProvider dateTimeOffsetProvider,
+    DiscussionService discussionService)
     : ICommandHandler<CreateDiscussionCommand, Guid>
 {
-    private readonly IDiscussionRepository discussionRepository = discussionRepository;
     private readonly IUserRepository userRepository = userRepository;
     private readonly IDateTimeOffsetProvider dateTimeOffsetProvider = dateTimeOffsetProvider;
+    private readonly DiscussionService discussionService = discussionService;
 
     public async Task<Result<Guid>> Handle(CreateDiscussionCommand request, CancellationToken cancellationToken)
     {
         // TODO: Add limit to amount of discussions a single user can create
 
-        if (!await userRepository.UserExistsAsync(request.UserId, cancellationToken))
+        User? user = await userRepository.GetByIdAsync(request.UserId, cancellationToken);
+
+        if (user == null)
         {
             return Result.Failure<Guid>(UserErrors.NotFound);
         }
@@ -36,7 +38,12 @@ internal sealed class CreateDiscussionCommandHandler(
 
         Discussion discussion = discussionResult.Value;
 
-        discussionRepository.Insert(discussion);
+        Result result = discussionService.CreateDiscussion(discussion, user);
+
+        if (result.IsFailure)
+        {
+            return Result.Failure<Guid>(result.Error);
+        }
 
         return Result.Success(discussion.Id);
     }

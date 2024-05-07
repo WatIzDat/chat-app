@@ -1,6 +1,7 @@
 using Application;
 using Clerk.Net.DependencyInjection;
 using Domain;
+using Domain.Discussions;
 using Infrastructure;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,8 @@ builder.Services.AddMediatR(options =>
 {
     options.RegisterServicesFromAssemblies(DomainAssemblyReference.Assembly, ApplicationAssemblyReference.Assembly);
 });
+
+builder.Services.AddScoped<DiscussionService>();
 
 // Add services to the container.
 
