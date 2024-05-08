@@ -11,33 +11,35 @@ const CreateDiscussion = z.object({
 });
 
 export async function createDiscussion(formData: FormData) {
-    // const { mutate } = useSWRConfig();
-
     const { name } = CreateDiscussion.parse({
         name: formData.get("name"),
     });
 
-    const response = await fetch(
-        "http://localhost:8080/discussions/create-discussion",
-        {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${await auth().getToken()}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                userId: auth().sessionClaims?.userId,
-                name: name,
-            }),
-        }
-    );
+    await fetch("http://localhost:8080/discussions/create-discussion", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${await auth().getToken()}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            userId: auth().sessionClaims?.userId,
+            name: name,
+        }),
+    });
+}
 
-    const result = await response.json();
+export async function joinDiscussion(id: string, formData: FormData) {
+    await fetch("http://localhost:8080/users/join-discussion", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${await auth().getToken()}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            userId: auth().sessionClaims?.userId,
+            discussionId: id,
+        }),
+    });
 
-    console.log(result);
-
-    // mutate("/api/my-discussions");
-
-    // console.log(name);
-    // console.log(auth().sessionClaims?.userId);
+    redirect(`/discussion/${id}`);
 }

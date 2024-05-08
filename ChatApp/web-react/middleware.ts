@@ -26,7 +26,10 @@ export default clerkMiddleware(async (auth, req) => {
                 auth().sessionClaims?.userId as string
             );
 
-        if (!joinedDiscussions.map((d) => d.id).includes(discussionId)) {
+        if (
+            joinedDiscussions &&
+            !joinedDiscussions.map((d) => d.id).includes(discussionId)
+        ) {
             const url = req.nextUrl.clone();
             url.pathname = `join-discussion/${discussionId}`;
 
@@ -43,7 +46,10 @@ export default clerkMiddleware(async (auth, req) => {
                 auth().sessionClaims?.userId as string
             );
 
-        if (joinedDiscussions.map((d) => d.id).includes(discussionId)) {
+        if (
+            joinedDiscussions &&
+            joinedDiscussions.map((d) => d.id).includes(discussionId)
+        ) {
             const url = req.nextUrl.clone();
             url.pathname = `discussion/${discussionId}`;
 
