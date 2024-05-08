@@ -6,6 +6,7 @@ using Application.Discussions.GetCreatedDiscussionsByUser;
 using Application.Discussions.GetDiscussionById;
 using Application.Discussions.GetJoinedDiscussionsByUser;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel;
 using Web.Api.Abstractions;
@@ -16,6 +17,7 @@ namespace Web.Api.Controllers;
 [Route("discussions")]
 public sealed class DiscussionsController(ISender sender) : ApiController(sender)
 {
+    [Authorize]
     [HttpPost("create-discussion")]
     public async Task<IResult> CreateDiscussion(
         [FromBody] CreateDiscussionCommand command,
@@ -26,6 +28,7 @@ public sealed class DiscussionsController(ISender sender) : ApiController(sender
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpDelete("delete-discussion")]
     public async Task<IResult> DeleteDiscussion(
         [FromQuery] Guid discussionId,
@@ -38,6 +41,7 @@ public sealed class DiscussionsController(ISender sender) : ApiController(sender
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpPost("edit-name")]
     public async Task<IResult> EditName(
         [FromBody] EditNameCommand command,
@@ -48,6 +52,7 @@ public sealed class DiscussionsController(ISender sender) : ApiController(sender
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpGet("get-created-discussions-by-user")]
     public async Task<IResult> GetCreatedDiscussionsByUser(
         [FromQuery] Guid userId,
@@ -60,6 +65,7 @@ public sealed class DiscussionsController(ISender sender) : ApiController(sender
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpGet("get-discussion-by-id")]
     public async Task<IResult> GetDiscussionById(
         [FromQuery] Guid id,
@@ -72,6 +78,7 @@ public sealed class DiscussionsController(ISender sender) : ApiController(sender
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpGet("get-joined-discussions-by-user")]
     public async Task<IResult> GetJoinedDiscussionsByUser(
         [FromQuery] Guid userId,

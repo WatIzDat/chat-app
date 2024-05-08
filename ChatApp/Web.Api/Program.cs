@@ -4,9 +4,11 @@ using Domain;
 using Domain.Discussions;
 using Infrastructure;
 using Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Scrutor;
+using System.Security.Claims;
 using Web.Api.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +49,33 @@ builder.Services.AddClerkApiClient(options =>
     options.SecretKey = builder.Configuration["Clerk:SecretKey"]!;
 });
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = builder.Configuration["Clerk:Authority"];
+
+        options.TokenValidationParameters = new()
+        {
+            ValidateAudience = false,
+            NameClaimType = ClaimTypes.NameIdentifier
+        };
+
+        options.Events = new JwtBearerEvents()
+        {
+            OnTokenValidated = context =>
+            {
+                string? azp = context.Principal?.FindFirstValue("azp");
+
+                if (string.IsNullOrEmpty(azp) || azp != builder.Configuration["Clerk:AuthorizedParty"])
+                {
+                    context.Fail("AZP claim is invalid or missing.");
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+    });
+
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -75,6 +104,7 @@ if (app.Environment.IsProduction())
 
 app.UseExceptionHandler();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

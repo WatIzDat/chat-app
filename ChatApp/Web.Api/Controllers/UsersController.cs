@@ -15,6 +15,7 @@ using Application.Users.UpdateAboutSection;
 using Clerk.Net.Client;
 using Clerk.Net.Client.Users.Item;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SharedKernel;
@@ -30,6 +31,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
 {
     private readonly ClerkApiClient clerkApiClient = clerkApiClient;
 
+    [Authorize]
     [HttpPost("add-role")]
     public async Task<IResult> AddRole(
         [FromBody] AddRoleCommand command,
@@ -40,6 +42,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpPost("change-email")]
     public async Task<IResult> ChangeEmail(
         [FromBody] ChangeEmailCommand command,
@@ -50,6 +53,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpPost("change-username")]
     public async Task<IResult> ChangeUsername(
         [FromBody] ChangeUsernameCommand command,
@@ -60,6 +64,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpDelete("delete-user")]
     public async Task<IResult> DeleteUser(
         [FromQuery] Guid userId,
@@ -72,6 +77,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpDelete("delete-user-by-clerk-id")]
     public async Task<IResult> DeleteUserByClerkId(
         [FromQuery] string clerkId,
@@ -84,6 +90,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpPost("/webhook/delete-user")]
     public async Task<IResult> DeleteUserWebhook(CancellationToken cancellationToken)
     {
@@ -104,6 +111,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
             cancellationToken);
     }
 
+    [Authorize]
     [HttpGet("get-user-by-clerk-id")]
     public async Task<IResult> GetUserByClerkId(
         [FromQuery] string clerkId,
@@ -116,6 +124,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpGet("get-users-by-discussion-id-and-role-id")]
     public async Task<IResult> GetUsersByDiscussionIdAndRoleId(
         [FromQuery] Guid discussionId,
@@ -137,6 +146,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpGet("get-users-with-no-role-by-discussion-id")]
     public async Task<IResult> GetUsersWithNoRoleByDiscussionId(
         [FromQuery] Guid discussionId,
@@ -157,6 +167,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
     }
 
 
+    [Authorize]
     [HttpPost("join-discussion")]
     public async Task<IResult> JoinDiscussion(
         [FromBody] JoinDiscussionCommand command,
@@ -167,6 +178,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpPost("leave-discussion")]
     public async Task<IResult> LeaveDiscussion(
         [FromBody] LeaveDiscussionCommand command,
@@ -177,6 +189,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpPost("register-user")]
     public async Task<IResult> RegisterUser(
         [FromBody] RegisterUserCommand command,
@@ -187,6 +200,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpPost("/webhook/register-user")]
     public async Task<IResult> RegisterUserWebhook(CancellationToken cancellationToken)
     {
@@ -222,6 +236,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
             cancellationToken);
     }
 
+    [Authorize]
     [HttpPost("remove-role")]
     public async Task<IResult> RemoveRole(
         [FromBody] RemoveRoleCommand command,
@@ -232,6 +247,7 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
+    [Authorize]
     [HttpPost("update-about-section")]
     public async Task<IResult> UpdateAboutSection(
         [FromBody] UpdateAboutSectionCommand command,
