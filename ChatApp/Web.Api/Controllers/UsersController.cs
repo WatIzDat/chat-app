@@ -90,7 +90,6 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
     }
 
-    [Authorize]
     [HttpPost("/webhook/delete-user")]
     public async Task<IResult> DeleteUserWebhook(CancellationToken cancellationToken)
     {
@@ -199,7 +198,6 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
     }
 
-    [Authorize]
     [HttpPost("/webhook/register-user")]
     public async Task<IResult> RegisterUserWebhook(CancellationToken cancellationToken)
     {
