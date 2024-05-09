@@ -1,7 +1,15 @@
+import { auth } from "@clerk/nextjs/server";
+
 export async function fetchUserById(id: string) {
     try {
         const response = await fetch(
-            `http://localhost:8080/users/get-user-by-clerk-id?clerkId=${id}`
+            `http://localhost:8080/users/get-user-by-clerk-id?clerkId=${id}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${await auth().getToken()}`,
+                },
+            }
         );
 
         if (!response.ok) {
@@ -18,7 +26,13 @@ export async function fetchUserById(id: string) {
 export async function fetchDiscussionById(id: string) {
     try {
         const response = await fetch(
-            `http://localhost:8080/discussions/get-discussion-by-id?id=${id}`
+            `http://localhost:8080/discussions/get-discussion-by-id?id=${id}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${await auth().getToken()}`,
+                },
+            }
         );
 
         if (!response.ok) {
@@ -35,7 +49,13 @@ export async function fetchDiscussionById(id: string) {
 export async function fetchCreatedDiscussionsByUser(userId: string) {
     try {
         const response = await fetch(
-            `http://localhost:8080/discussions/get-created-discussions-by-user?userId=${userId}`
+            `http://localhost:8080/discussions/get-created-discussions-by-user?userId=${userId}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${await auth().getToken()}`,
+                },
+            }
         );
 
         if (!response.ok) {
@@ -52,7 +72,13 @@ export async function fetchCreatedDiscussionsByUser(userId: string) {
 export async function fetchJoinedDiscussionsByUser(userId: string) {
     try {
         const response = await fetch(
-            `http://localhost:8080/discussions/get-joined-discussions-by-user?userId=${userId}`
+            `http://localhost:8080/discussions/get-joined-discussions-by-user?userId=${userId}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${await auth().getToken()}`,
+                },
+            }
         );
 
         if (!response.ok) {

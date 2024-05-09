@@ -166,7 +166,6 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
     }
 
-
     [Authorize]
     [HttpPost("join-discussion")]
     public async Task<IResult> JoinDiscussion(

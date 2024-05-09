@@ -25,6 +25,11 @@ export default function Navbar() {
                     </div>
                 </SignedOut>
                 <SignedIn>
+                    <div className="ml-8">
+                        <Link href="/joined-discussions">
+                            Joined Discussions
+                        </Link>
+                    </div>
                     <div className="ml-auto">
                         <Link href="/my-discussions">My Discussions</Link>
                     </div>
