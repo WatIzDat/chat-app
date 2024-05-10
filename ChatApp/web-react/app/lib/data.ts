@@ -46,10 +46,10 @@ export async function fetchDiscussionById(id: string) {
     }
 }
 
-export async function fetchCreatedDiscussionsByUser(userId: string) {
+export async function fetchCreatedDiscussionsByUser() {
     try {
         const response = await fetch(
-            `http://localhost:8080/discussions/get-created-discussions-by-user?userId=${userId}`,
+            `http://localhost:8080/discussions/get-created-discussions-by-user`,
             {
                 method: "GET",
                 headers: {
@@ -69,10 +69,10 @@ export async function fetchCreatedDiscussionsByUser(userId: string) {
     }
 }
 
-export async function fetchJoinedDiscussionsByUser(userId: string) {
+export async function fetchJoinedDiscussionsByUser() {
     try {
         const response = await fetch(
-            `http://localhost:8080/discussions/get-joined-discussions-by-user?userId=${userId}`,
+            `http://localhost:8080/discussions/get-joined-discussions-by-user`,
             {
                 method: "GET",
                 headers: {

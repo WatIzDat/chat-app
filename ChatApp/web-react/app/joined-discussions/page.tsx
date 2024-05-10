@@ -4,9 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 
 export default async function Page() {
     const discussions: { id: string; name: string }[] =
-        await fetchJoinedDiscussionsByUser(
-            auth().sessionClaims?.userId as string
-        );
+        await fetchJoinedDiscussionsByUser();
 
     const discussionLinks = [];
 

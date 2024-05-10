@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using SharedKernel;
 using Web.Api.Abstractions;
 using Web.Api.Extensions;
+using Web.Api.Infrastructure.Filters;
 
 namespace Web.Api.Controllers;
 
@@ -53,9 +54,10 @@ public sealed class DiscussionsController(ISender sender) : ApiController(sender
     }
 
     [Authorize]
+    [GetUserIdFromAccessToken]
     [HttpGet("get-created-discussions-by-user")]
     public async Task<IResult> GetCreatedDiscussionsByUser(
-        [FromQuery] Guid userId,
+        Guid userId,
         CancellationToken cancellationToken)
     {
         GetCreatedDiscussionsByUserQuery query = new(userId);
@@ -79,9 +81,10 @@ public sealed class DiscussionsController(ISender sender) : ApiController(sender
     }
 
     [Authorize]
+    [GetUserIdFromAccessToken]
     [HttpGet("get-joined-discussions-by-user")]
     public async Task<IResult> GetJoinedDiscussionsByUser(
-        [FromQuery] Guid userId,
+        Guid userId,
         CancellationToken cancellationToken)
     {
         GetJoinedDiscussionsByUserQuery query = new(userId);
