@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using SharedKernel;
 using Web.Api.Abstractions;
 using Web.Api.Extensions;
+using Web.Api.Infrastructure.Filters;
 using Web.Api.Mappings;
 using Web.Api.Utility;
 
@@ -166,11 +167,17 @@ public sealed class UsersController(ISender sender, ClerkApiClient clerkApiClien
     }
 
     [Authorize]
+    [GetUserIdFromAccessToken]
     [HttpPost("join-discussion")]
     public async Task<IResult> JoinDiscussion(
         [FromBody] JoinDiscussionCommand command,
         CancellationToken cancellationToken)
     {
+        if (command.UserId != (Guid)HttpContext.Items[Constants.UserIdKey]!)
+        {
+            return Results.Forbid();
+        }
+
         Result result = await Sender.Send(command, cancellationToken);
 
         return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();

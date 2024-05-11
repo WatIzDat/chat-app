@@ -22,11 +22,11 @@ public class GetUserIdFromAccessTokenAttribute : Attribute, IActionFilter
 
         if (Guid.TryParse(accessToken.Payload["userId"].ToString()!, out Guid userId))
         {
-            context.ActionArguments["userId"] = userId;
+            context.HttpContext.Items.Add(Constants.UserIdKey, userId);
         }
         else
         {
-            context.ActionArguments["userId"] = Guid.Empty;
+            context.HttpContext.Items.Add(Constants.UserIdKey, Guid.Empty);
         }
     }
 }
