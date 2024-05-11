@@ -2,9 +2,9 @@
 
 import AddDiscussionButton from "@/app/ui/add-discussion-button";
 import Modal from "@/app/ui/modal";
-import { FormEvent, useEffect, useState } from "react";
+import { useState } from "react";
 import { createDiscussion } from "@/app/lib/actions";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import DiscussionLink from "@/app/ui/discussion-link";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());

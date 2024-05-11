@@ -4,10 +4,12 @@ using Application.Messages.EditContents;
 using Application.Messages.GetMessagesInDiscussion;
 using Application.Messages.SendMessage;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel;
 using Web.Api.Abstractions;
 using Web.Api.Extensions;
+using Web.Api.Infrastructure.Filters;
 
 namespace Web.Api.Controllers;
 
@@ -55,11 +57,18 @@ public class MessagesController(ISender sender) : ApiController(sender)
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
     }
 
+    [Authorize]
+    [GetUserIdFromAccessToken]
     [HttpPost("send-message")]
     public async Task<IResult> SendMessage(
         [FromBody] SendMessageCommand command,
         CancellationToken cancellationToken)
     {
+        if (command.UserId != (Guid)HttpContext.Items[Constants.UserIdKey]!)
+        {
+            return Results.Forbid();
+        }
+        
         Result<Guid> result = await Sender.Send(command, cancellationToken);
 
         return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();

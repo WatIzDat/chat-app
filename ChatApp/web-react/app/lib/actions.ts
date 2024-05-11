@@ -43,3 +43,18 @@ export async function joinDiscussion(id: string, formData: FormData) {
 
     redirect(`/discussion/${id}`);
 }
+
+export async function sendMessage(discussionId: string, formData: FormData) {
+    await fetch("http://localhost:8080/messages/send-message", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${await auth().getToken()}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            userId: auth().sessionClaims?.userId,
+            discussionId: discussionId,
+            contents: formData.get("contents"),
+        }),
+    });
+}
