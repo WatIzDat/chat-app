@@ -1,4 +1,5 @@
 import { fetchJoinedDiscussionsByUser } from "@/app/lib/data";
+import DiscussionContents from "@/app/ui/discussion-contents";
 import SendMessageForm from "@/app/ui/send-message-form";
 import { redirect } from "next/navigation";
 
@@ -16,6 +17,8 @@ export default async function Page({ params }: { params: { id: string } }) {
     return (
         <main className="h-full">
             <div className="flex flex-col items-center justify-end h-full">
+                <DiscussionContents />
+
                 <SendMessageForm discussionId={params.id} />
             </div>
         </main>
