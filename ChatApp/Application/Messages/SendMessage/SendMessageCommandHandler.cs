@@ -12,7 +12,8 @@ internal sealed class SendMessageCommandHandler(
     IUserRepository userRepository,
     IDiscussionRepository discussionRepository,
     IBanRepository banRepository,
-    IDateTimeOffsetProvider dateTimeOffsetProvider)
+    IDateTimeOffsetProvider dateTimeOffsetProvider,
+    IMessageNotifications messageNotifications)
     : ICommandHandler<SendMessageCommand, Guid>
 {
     private readonly IMessageRepository messageRepository = messageRepository;
@@ -20,10 +21,13 @@ internal sealed class SendMessageCommandHandler(
     private readonly IDiscussionRepository discussionRepository = discussionRepository;
     private readonly IBanRepository banRepository = banRepository;
     private readonly IDateTimeOffsetProvider dateTimeOffsetProvider = dateTimeOffsetProvider;
+    private readonly IMessageNotifications messageNotifications = messageNotifications;
 
     public async Task<Result<Guid>> Handle(SendMessageCommand request, CancellationToken cancellationToken)
     {
-        if (!await userRepository.UserExistsAsync(request.UserId, cancellationToken))
+        User? user = await userRepository.GetByIdAsync(request.UserId, cancellationToken);
+
+        if (user == null)
         {
             return Result.Failure<Guid>(UserErrors.NotFound);
         }
@@ -51,6 +55,8 @@ internal sealed class SendMessageCommandHandler(
         {
             return Result.Failure<Guid>(messageResult.Error);
         }
+
+        await messageNotifications.SendMessageAsync(user.Username, request.Contents);
 
         Message message = messageResult.Value;
 

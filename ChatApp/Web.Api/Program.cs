@@ -2,6 +2,7 @@ using Application;
 using Clerk.Net.DependencyInjection;
 using Domain;
 using Domain.Discussions;
+using Domain.Messages;
 using Infrastructure;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,6 +11,8 @@ using Microsoft.Extensions.Options;
 using Scrutor;
 using System.Security.Claims;
 using Web.Api.Infrastructure;
+using Web.Api.Notifications;
+using Web.Api.SignalR.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +36,8 @@ builder.Services.AddMediatR(options =>
 });
 
 builder.Services.AddScoped<DiscussionService>();
+
+builder.Services.AddScoped<IMessageNotifications, MessageNotifications>();
 
 // Add services to the container.
 
@@ -76,6 +81,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddSignalR();
+
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -108,6 +115,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<ChatHub>("chat-hub");
 
 app.Run();
 
