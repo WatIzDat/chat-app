@@ -5,56 +5,103 @@ namespace Domain.UnitTests.Discussions;
 
 public class DiscussionTests
 {
-    private static readonly Discussion Discussion = Discussion.Create(
-        Guid.NewGuid(),
-        "test",
-        DateTimeOffset.UtcNow).Value;
+    private static Discussion CreateDefaultDiscussion()
+    {
+        return Discussion.Create(
+            Guid.Empty,
+            "test",
+            DateTimeOffset.MinValue).Value;
+    }
 
     [Fact]
     public void Create_Should_ReturnSuccess()
     {
-        Result<Discussion> result = Discussion.Create(
-            Discussion.UserCreatedBy,
-            Discussion.Name,
-            Discussion.DateCreatedUtc);
+        // Arrange
+        Discussion referenceDiscussion = CreateDefaultDiscussion();
 
+        // Act
+        Result<Discussion> result = Discussion.Create(
+            referenceDiscussion.UserCreatedBy,
+            referenceDiscussion.Name,
+            referenceDiscussion.DateCreatedUtc);
+
+        // Assert
         result.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
     public void Create_Should_ReturnNameTooLong_WhenNameIsLongerThanMaxLength()
     {
-        Result<Discussion> result = Discussion.Create(
-            Discussion.UserCreatedBy,
-            "this name is too longaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            Discussion.DateCreatedUtc);
+        // Arrange
+        Discussion referenceDiscussion = CreateDefaultDiscussion();
 
+        string nameLongerThanMaxLength = string.Empty.PadLeft(Discussion.NameMaxLength + 1);
+
+        // Act
+        Result<Discussion> result = Discussion.Create(
+            referenceDiscussion.UserCreatedBy,
+            nameLongerThanMaxLength,
+            referenceDiscussion.DateCreatedUtc);
+
+        // Assert
         result.Error.Should().Be(DiscussionErrors.NameTooLong);
     }
 
     [Fact]
-    public void EditName_Should_ReturnSuccess_And_ChangeName()
+    public void EditName_Should_ReturnSuccess()
     {
-        Result result = Discussion.EditName("hello");
+        // Arrange
+        Discussion defaultDiscussion = CreateDefaultDiscussion();
 
+        string validName = "a";
+
+        // Act
+        Result result = defaultDiscussion.EditName(validName);
+
+        // Assert
         result.IsSuccess.Should().BeTrue();
+    }
 
-        Discussion.Name.Should().Be("hello");
+    [Fact]
+    public void EditName_Should_ChangeName()
+    {
+        // Arrange
+        Discussion defaultDiscussion = CreateDefaultDiscussion();
+
+        string validName = "a";
+
+        // Act
+        defaultDiscussion.EditName(validName);
+
+        // Assert
+        defaultDiscussion.Name.Should().Be(validName);
     }
 
     [Fact]
     public void EditName_Should_ReturnNameTooLong_WhenNameIsLongerThanMaxLength()
     {
-        Result result = Discussion.EditName("this name is too longaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        // Arrange
+        Discussion defaultDiscussion = CreateDefaultDiscussion();
 
+        string nameLongerThanMaxLength = string.Empty.PadLeft(Discussion.NameMaxLength + 1);
+
+        // Act
+        Result result = defaultDiscussion.EditName(nameLongerThanMaxLength);
+
+        // Assert
         result.Error.Should().Be(DiscussionErrors.NameTooLong);
     }
 
     [Fact]
     public void Delete_Should_SetIsDeletedToTrue()
     {
-        Discussion.Delete();
+        // Arrange
+        Discussion defaultDiscussion = CreateDefaultDiscussion();
 
-        Discussion.IsDeleted.Should().BeTrue();
+        // Act
+        defaultDiscussion.Delete();
+
+        // Assert
+        defaultDiscussion.IsDeleted.Should().BeTrue();
     }
 }
