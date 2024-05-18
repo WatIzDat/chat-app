@@ -8,26 +8,41 @@ public class AboutSectionTests
     [Fact]
     public void Create_Should_ReturnSuccess()
     {
-        Result<AboutSection> result = AboutSection.Create("This is a test.");
+        // Arrange
+        string validValue = "This is a test.";
 
+        // Act
+        Result<AboutSection> result = AboutSection.Create(validValue);
+
+        // Assert
         result.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
     public void Create_Should_ReplaceLineEndings()
     {
-        Result<AboutSection> result = AboutSection.Create("This is a test\n");
+        // Arrange
+        string unnormalizedLineEndings = "This is a test\n";
 
-        result.IsSuccess.Should().BeTrue();
+        // Act
+        Result<AboutSection> result = AboutSection.Create(unnormalizedLineEndings);
 
-        result.Value.Should().Be(AboutSection.Create("This is a test\r\n").Value);
+        // Assert
+        string normalizedLineEndings = "This is a test\r\n";
+
+        result.Value.Should().Be(AboutSection.Create(normalizedLineEndings).Value);
     }
 
     [Fact]
     public void Create_Should_ReturnTooLong_WhenAboutSectionIsLongerThanMaxLength()
     {
-        Result<AboutSection> result = AboutSection.Create("This about section is too long aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        // Arrange
+        string longerThanMaxLength = string.Empty.PadLeft(AboutSection.MaxLength + 1);
 
+        // Act
+        Result<AboutSection> result = AboutSection.Create(longerThanMaxLength);
+
+        // Assert
         result.Error.Should().Be(AboutSectionErrors.TooLong);
     }
 }

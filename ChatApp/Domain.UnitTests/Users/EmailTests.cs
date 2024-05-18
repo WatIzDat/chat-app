@@ -8,8 +8,13 @@ public class EmailTests
     [Fact]
     public void Create_Should_ReturnSuccess()
     {
-        Result<Email> result = Email.Create("test@test.com");
+        // Arrange
+        string validValue = "test@test.com";
 
+        // Act
+        Result<Email> result = Email.Create(validValue);
+
+        // Assert
         result.IsSuccess.Should().BeTrue();
     }
 
@@ -18,8 +23,10 @@ public class EmailTests
     [InlineData("")]
     public void Create_Should_ReturnEmailErrorsEmpty_WhenEmailIsNullOrEmpty(string value)
     {
+        // Act
         Result<Email> result = Email.Create(value);
 
+        // Assert
         result.Error.Should().Be(EmailErrors.Empty);
     }
 
@@ -29,8 +36,10 @@ public class EmailTests
     [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@testttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt.com")]
     public void Create_Should_ReturnInvalidFormat_WhenEmailHasInvalidFormat(string value)
     {
+        // Act
         Result<Email> result = Email.Create(value);
 
+        // Assert
         result.Error.Should().Be(EmailErrors.InvalidFormat);
     }
 }

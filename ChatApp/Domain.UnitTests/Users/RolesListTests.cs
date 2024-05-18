@@ -9,8 +9,9 @@ public class RolesListTests
     public void Create_Should_ReturnSuccess()
     {
         // Arrange
-        List<Guid> roles = [Guid.NewGuid(), Guid.NewGuid()];
-        DiscussionsList discussions = DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
+        Guid testGuid = Guid.Empty;
+
+        List<Guid> roles = [testGuid];
 
         // Act
         Result<RolesList> result = RolesList.Create(roles);
@@ -23,10 +24,9 @@ public class RolesListTests
     public void Create_Should_ReturnDuplicateRoles_WhenDuplicateGuidsAreInList()
     {
         // Arrange
-        Guid roleId = Guid.NewGuid();
+        Guid testGuid = Guid.Empty;
 
-        List<Guid> roles = [roleId, roleId];
-        DiscussionsList discussions = DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
+        List<Guid> roles = [testGuid, testGuid];
 
         // Act
         Result<RolesList> result = RolesList.Create(roles);

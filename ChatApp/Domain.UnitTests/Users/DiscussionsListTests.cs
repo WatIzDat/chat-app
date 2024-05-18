@@ -8,8 +8,13 @@ public class DiscussionsListTests
     [Fact]
     public void Create_Should_ReturnSuccess()
     {
-        Result<DiscussionsList> result = DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]);
+        // Arrange
+        Guid testGuid = Guid.Empty; 
 
+        // Act
+        Result<DiscussionsList> result = DiscussionsList.Create([testGuid]);
+
+        // Assert
         result.IsSuccess.Should().BeTrue();
     }
 
@@ -34,10 +39,13 @@ public class DiscussionsListTests
     [Fact]
     public void Create_Should_ReturnDuplicateDiscussions_WhenDuplicateGuidsAreInList()
     {
-        Guid discussionId = Guid.NewGuid();
+        // Arrange
+        Guid testGuid = Guid.Empty;
 
-        Result<DiscussionsList> result = DiscussionsList.Create([discussionId, discussionId]);
+        // Act
+        Result<DiscussionsList> result = DiscussionsList.Create([testGuid, testGuid]);
 
+        // Assert
         result.Error.Should().Be(DiscussionsListErrors.DuplicateDiscussions);
     }
 }
