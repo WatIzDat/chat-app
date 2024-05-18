@@ -5,66 +5,108 @@ namespace Domain.UnitTests.Messages;
 
 public class MessageTests
 {
-    private static readonly Message Message = Message.Create(
-        Guid.NewGuid(),
-        Guid.NewGuid(),
-        "This is a message.",
-        DateTimeOffset.UtcNow).Value;
+    private static Message CreateDefaultMessage()
+    {
+        return Message.Create(
+            Guid.Empty,
+            Guid.Empty,
+            "test",
+            DateTimeOffset.MinValue).Value;
+    }
 
     [Fact]
     public void Create_Should_ReturnSuccess()
     {
-        Result<Message> result = Message.Create(
-            Message.UserId,
-            Message.DiscussionId,
-            Message.Contents,
-            Message.DateSentUtc);
+        // Arrange
+        Message referenceMessage = CreateDefaultMessage();
 
+        // Act
+        Result<Message> result = Message.Create(
+            referenceMessage.UserId,
+            referenceMessage.DiscussionId,
+            referenceMessage.Contents,
+            referenceMessage.DateSentUtc);
+
+        // Assert
         result.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
     public void Create_Should_ReturnContentsTooLong_WhenContentsIsLongerThanMaxLength()
     {
-        string contents = string.Empty;
+        // Arrange
+        Message referenceMessage = CreateDefaultMessage();
 
-        for (int i = 0; i < Message.ContentsMaxLength + 1; i++)
-        {
-            contents += "a";
-        }
+        string contentsLongerThanMaxLength = string.Empty.PadLeft(Message.ContentsMaxLength + 1);
 
+        // Act
         Result<Message> result = Message.Create(
-            Message.UserId,
-            Message.DiscussionId,
-            contents,
-            Message.DateSentUtc);
+            referenceMessage.UserId,
+            referenceMessage.DiscussionId,
+            contentsLongerThanMaxLength,
+            referenceMessage.DateSentUtc);
 
+        // Assert
         result.Error.Should().Be(MessageErrors.ContentsTooLong);
     }
 
     [Fact]
-    public void EditContents_Should_ReturnSuccess_And_ChangeContents_And_SetIsEditedToTrue()
+    public void EditContents_Should_ReturnSuccess()
     {
-        Result result = Message.EditContents("hello");
+        // Arrange
+        Message defaultMessage = CreateDefaultMessage();
 
+        string validContents = "a";
+
+        // Act
+        Result result = defaultMessage.EditContents(validContents);
+
+        // Assert
         result.IsSuccess.Should().BeTrue();
+    }
 
-        Message.Contents.Should().Be("hello");
-        Message.IsEdited.Should().Be(true);
+    [Fact]
+    public void EditContents_Should_ChangeContents()
+    {
+        // Arrange
+        Message defaultMessage = CreateDefaultMessage();
+
+        string validContents = "a";
+
+        // Act
+        defaultMessage.EditContents(validContents);
+
+        // Assert
+        defaultMessage.Contents.Should().Be(validContents);
+    }
+
+    [Fact]
+    public void EditContents_Should_SetIsEditedToTrue()
+    {
+        // Arrange
+        Message defaultMessage = CreateDefaultMessage();
+
+        string validContents = "a";
+
+        // Act
+        defaultMessage.EditContents(validContents);
+
+        // Assert
+        defaultMessage.IsEdited.Should().BeTrue();
     }
 
     [Fact]
     public void EditContents_Should_ReturnContentsTooLong_WhenContentsIsLongerThanMaxLength()
     {
-        string contents = string.Empty;
+        // Arrange
+        Message defaultMessage = CreateDefaultMessage();
 
-        for (int i = 0; i < Message.ContentsMaxLength + 1; i++)
-        {
-            contents += "a";
-        }
+        string contentsLongerThanMaxLength = string.Empty.PadLeft(Message.ContentsMaxLength + 1);
 
-        Result result = Message.EditContents(contents);
+        // Act
+        Result result = defaultMessage.EditContents(contentsLongerThanMaxLength);
 
+        // Assert
         result.Error.Should().Be(MessageErrors.ContentsTooLong);
     }
 }
