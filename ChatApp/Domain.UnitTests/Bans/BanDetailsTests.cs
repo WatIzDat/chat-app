@@ -6,32 +6,66 @@ namespace Domain.UnitTests.Bans;
 public class BanDetailsTests
 {
     [Fact]
-    public void CreateTemporaryBan_Should_ReturnBanDetails_WhereIsBanPermanentIsFalse_And_DateOfUnbanIsSet()
+    public void CreateTemporaryBan_Should_ReturnBanDetails_Where_IsBanPermanentIsFalse()
     {
-        DateTimeOffset utcNow = DateTimeOffset.UtcNow;
+        // Arrange
+        DateTimeOffset currentTime = DateTimeOffset.MinValue;
+        DateTimeOffset dateWillBeUnbanned = currentTime.AddDays(1);
 
-        BanDetails banDetails = BanDetails.CreateTemporaryBan(utcNow, utcNow.AddDays(1)).Value;
+        // Act
+        BanDetails banDetails = BanDetails.CreateTemporaryBan(currentTime, dateWillBeUnbanned).Value;
 
+        // Assert
         banDetails.IsBanPermanent.Should().BeFalse();
-        banDetails.DateWillBeUnbannedUtc.Should().Be(utcNow.AddDays(1));
     }
 
     [Fact]
-    public void CreatePermanentBan_Should_ReturnBanDetails_WhereIsBanPermanentIsTrue_And_DateOfUnbanIsNull()
+    public void CreateTemporaryBan_Should_ReturnBanDetails_Where_DateOfUnbanIsSet()
     {
+        // Arrange
+        DateTimeOffset currentTime = DateTimeOffset.MinValue;
+        DateTimeOffset dateWillBeUnbanned = currentTime.AddDays(1);
+
+        // Act
+        BanDetails banDetails = BanDetails.CreateTemporaryBan(currentTime, dateWillBeUnbanned).Value;
+
+        // Assert
+        banDetails.DateWillBeUnbannedUtc.Should().Be(dateWillBeUnbanned);
+    }
+
+    [Fact]
+    public void CreatePermanentBan_Should_ReturnBanDetails_Where_IsBanPermanentIsTrue()
+    {
+        // Act
         BanDetails banDetails = BanDetails.CreatePermanentBan();
 
+        // Assert
         banDetails.IsBanPermanent.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CreatePermanentBan_Should_ReturnBanDetails_Where_DateOfUnbanIsNull()
+    {
+        // Act
+        BanDetails banDetails = BanDetails.CreatePermanentBan();
+
+        // Assert
         banDetails.DateWillBeUnbannedUtc.Should().BeNull();
     }
 
     [Fact]
     public void CreateTemporaryBan_Should_ReturnCurrentTimePastDateWillBeUnbanned_WhenCurrentTimeIsPastDateWillBeUnbanned()
     {
-        Result result = BanDetails.CreateTemporaryBan(
-            DateTimeOffset.UtcNow.AddDays(1),
-            DateTimeOffset.UtcNow);
+        // Arrange
+        DateTimeOffset dateWillBeUnbanned = DateTimeOffset.MinValue;
+        DateTimeOffset currentTimePastDateWillBeUnbanned = dateWillBeUnbanned.AddDays(1);
 
+        // Act
+        Result result = BanDetails.CreateTemporaryBan(
+            currentTimePastDateWillBeUnbanned,
+            dateWillBeUnbanned);
+
+        // Assert
         result.Error.Should().Be(BanErrors.CurrentTimePastDateWillBeUnbanned);
     }
 }

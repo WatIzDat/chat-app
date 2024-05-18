@@ -12,7 +12,7 @@ public class UserTests
         return User.Create(
             "test123",
             Email.Create("test@test.com").Value,
-            DateTimeOffset.UtcNow,
+            DateTimeOffset.MinValue,
             AboutSection.Create("This is a test.").Value,
             CreateDefaultDiscussionsList(),
             CreateDefaultRolesList(),
