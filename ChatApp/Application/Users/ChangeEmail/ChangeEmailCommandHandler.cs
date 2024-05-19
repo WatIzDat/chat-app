@@ -27,6 +27,11 @@ internal sealed class ChangeEmailCommandHandler(IUserRepository userRepository)
 
         Email email = emailResult.Value;
 
+        if (!await userRepository.IsEmailUniqueAsync(email, cancellationToken))
+        {
+            return Result.Failure<Guid>(UserErrors.EmailNotUnique);
+        }
+
         user.ChangeEmail(email);
 
         userRepository.Update(user);

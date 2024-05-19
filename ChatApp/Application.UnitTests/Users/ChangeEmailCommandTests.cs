@@ -14,6 +14,13 @@ public class ChangeEmailCommandTests : BaseUserTest<ChangeEmailCommand>
 
     protected override void ConfigureMocks(User user, ChangeEmailCommand command, Action? overrides = null)
     {
+        Result<Email> emailResult = Email.Create(command.Email);
+
+        if (emailResult.IsSuccess)
+        {
+            userRepositoryMock.IsEmailUniqueAsync(Arg.Is(Email.Create(command.Email).Value)).Returns(true);
+        }
+
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
 
         base.ConfigureMocks(user, command, overrides);
@@ -95,6 +102,26 @@ public class ChangeEmailCommandTests : BaseUserTest<ChangeEmailCommand>
 
         // Assert
         result.Error.Should().Be(EmailErrors.InvalidFormat);
+    }
+
+    [Fact]
+    public async Task Handle_Should_ReturnEmailNotUnique_WhenIsEmailUniqueAsyncReturnsFalse()
+    {
+        // Arrange
+        User user = CreateDefaultUser();
+
+        ChangeEmailCommand command = new(user.Id, ValidEmail);
+
+        ConfigureMocks(user, command, overrides: () =>
+        {
+            userRepositoryMock.IsEmailUniqueAsync(Arg.Is(Email.Create(command.Email).Value)).Returns(false);
+        });
+
+        // Act
+        Result result = await commandHandler.Handle(command, default);
+        
+        // Assert
+        result.Error.Should().Be(UserErrors.EmailNotUnique);
     }
 
     [Fact]

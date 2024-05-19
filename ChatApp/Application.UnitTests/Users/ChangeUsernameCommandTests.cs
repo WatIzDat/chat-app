@@ -101,6 +101,26 @@ public class ChangeUsernameCommandTests : BaseUserTest<ChangeUsernameCommand>
     }
 
     [Fact]
+    public async Task Handle_Should_ReturnUsernameNotUnique_WhenIsUsernameUniqueAsyncReturnsFalse()
+    {
+        // Arrange
+        User user = CreateDefaultUser();
+
+        ChangeUsernameCommand command = new(user.Id, ValidUsername);
+
+        ConfigureMocks(user, command, overrides: () =>
+        {
+            userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(command.Username)).Returns(false);
+        });
+
+        // Act
+        Result result = await commandHandler.Handle(command, default);
+
+        // Assert
+        result.Error.Should().Be(UserErrors.UsernameNotUnique);
+    }
+
+    [Fact]
     public async Task Handle_Should_CallUserRepositoryUpdate()
     {
         // Arrange
