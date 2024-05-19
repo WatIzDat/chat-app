@@ -5,13 +5,17 @@ using SharedKernel;
 
 namespace Application.UnitTests.Roles;
 
-public class AddPermissionCommandTests
+public class AddPermissionCommandTests : BaseRoleTest<AddPermissionCommand>
 {
-    private static readonly Role Role = Role.Create(
-        Guid.NewGuid(), "test", [Permission.BanUser, Permission.DeleteMessage]).Value;
-
     private readonly AddPermissionCommandHandler commandHandler;
     private readonly IRoleRepository roleRepositoryMock;
+
+    protected override void ConfigureMocks(Role role, AddPermissionCommand command, Action? overrides = null)
+    {
+        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+
+        base.ConfigureMocks(role, command, overrides);
+    }
 
     public AddPermissionCommandTests()
     {
@@ -23,87 +27,109 @@ public class AddPermissionCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
         AddPermissionCommand command = new(role.Id, Permission.KickUser.Value);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        ConfigureMocks(role, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
+    }
 
+    [Fact]
+    public async Task Handle_Should_AddPermission()
+    {
+        // Arrange
+        Role role = CreateDefaultRole();
+
+        AddPermissionCommand command = new(role.Id, Permission.KickUser.Value);
+
+        ConfigureMocks(role, command);
+
+        // Act
+        await commandHandler.Handle(command, default);
+
+        // Assert
         role.Permissions.Should().Contain(Permission.KickUser);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnRoleNotFound_WhenGetByIdAsyncReturnsNull()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
         AddPermissionCommand command = new(role.Id, Permission.KickUser.Value);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).ReturnsNull();
+        ConfigureMocks(role, command, overrides: () =>
+        {
+            roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).ReturnsNull();
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(RoleErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnPermissionNotAllowed_WhenPermissionIsNotInListOfAllowedPermissions()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        AddPermissionCommand command = new(role.Id, "this permission is not allowed");
+        string invalidPermission = "";
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        AddPermissionCommand command = new(role.Id, invalidPermission);
 
+        ConfigureMocks(role, command);
+
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(PermissionErrors.NotAllowed);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnDuplicatePermissions_WhenDuplicatePermissionIsAdded()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        AddPermissionCommand command = new(role.Id, Permission.BanUser.Value);
+        AddPermissionCommand command = new(role.Id, Permission.KickUser.Value);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        ConfigureMocks(role, command);
 
+        await commandHandler.Handle(command, default);
+
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(RoleErrors.DuplicatePermissions);
     }
 
     [Fact]
     public async Task Handle_Should_CallRoleRepositoryUpdate()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
         AddPermissionCommand command = new(role.Id, Permission.KickUser.Value);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        ConfigureMocks(role, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         roleRepositoryMock
             .Received(1)
             .Update(Arg.Is<Role>(r => r.Id == command.RoleId));
