@@ -6,28 +6,21 @@ using SharedKernel;
 
 namespace Application.UnitTests.Users;
 
-public class JoinDiscussionCommandTests
+public class JoinDiscussionCommandTests : BaseUserTest<JoinDiscussionCommand>
 {
-    private static readonly Guid DiscussionId = new("ac6338e8-cb43-499a-b8c3-511ac099362e");
-
-    private static readonly DiscussionsList Discussions =
-        DiscussionsList.Create([Guid.NewGuid()]).Value;
-
-    private static readonly RolesList Roles =
-        RolesList.Create([Guid.NewGuid()]).Value;
-
-    private static readonly User User = User.Create(
-            "test123",
-            Email.Create("test@test.com").Value,
-            DateTimeOffset.UtcNow,
-            AboutSection.Create("This is a test.").Value,
-            Discussions,
-            Roles,
-            "test").Value;
+    private static readonly Guid DiscussionId = Guid.Empty;
 
     private readonly JoinDiscussionCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
     private readonly IDiscussionRepository discussionRepositoryMock;
+
+    protected override void ConfigureMocks(User user, JoinDiscussionCommand command, Action? overrides = null)
+    {
+        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(true);
+
+        base.ConfigureMocks(user, command, overrides);
+    }
 
     public JoinDiscussionCommandTests()
     {
@@ -40,110 +33,93 @@ public class JoinDiscussionCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         JoinDiscussionCommand command = new(user.Id, DiscussionId);
         
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(true);
+        ConfigureMocks(user, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
     public async Task Handle_Should_ReturnUserNotFound_WhenGetByIdAsyncReturnsNull()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         JoinDiscussionCommand command = new(user.Id, DiscussionId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
-        discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(true);
+        ConfigureMocks(user, command, overrides: () =>
+        {
+            userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(UserErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnDiscussionNotFound_WhenDiscussionExistsAsyncReturnsFalse()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         JoinDiscussionCommand command = new(user.Id, DiscussionId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(false);
+        ConfigureMocks(user, command, overrides: () =>
+        {
+            discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(false);
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(DiscussionErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnDuplicateDiscussions_WhenDuplicateGuidIsAdded()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
-        JoinDiscussionCommand command = new(user.Id, user.Discussions.Value[0]);
+        JoinDiscussionCommand command = new(user.Id, DiscussionId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(true);
+        ConfigureMocks(user, command);
 
+        await commandHandler.Handle(command, default);
+
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(DiscussionsListErrors.DuplicateDiscussions);
     }
 
     [Fact]
     public async Task Handle_Should_CallUserRepositoryUpdate()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         JoinDiscussionCommand command = new(user.Id, DiscussionId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        discussionRepositoryMock.DiscussionExistsAsync(Arg.Is(command.DiscussionId)).Returns(true);
+        ConfigureMocks(user, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         userRepositoryMock
             .Received(1)
             .Update(Arg.Is<User>(u => u.Id == command.UserId));
