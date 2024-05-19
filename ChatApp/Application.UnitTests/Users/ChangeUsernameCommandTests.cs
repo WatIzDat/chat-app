@@ -5,25 +5,20 @@ using SharedKernel;
 
 namespace Application.UnitTests.Users;
 
-public class ChangeUsernameCommandTests
+public class ChangeUsernameCommandTests : BaseUserTest<ChangeUsernameCommand>
 {
-    private static readonly DiscussionsList Discussions =
-        DiscussionsList.Create([Guid.NewGuid()]).Value;
-
-    private static readonly RolesList Roles =
-        RolesList.Create([Guid.NewGuid()]).Value;
-
-    private static readonly User User = User.Create(
-            "test123",
-            Email.Create("test@test.com").Value,
-            DateTimeOffset.UtcNow,
-            AboutSection.Create("This is a test.").Value,
-            Discussions,
-            Roles,
-            "test").Value;
+    private const string ValidUsername = "test";
 
     private readonly ChangeUsernameCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
+
+    protected override void ConfigureMocks(User user, ChangeUsernameCommand command, Action? overrides = null)
+    {
+        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(command.Username)).Returns(true);
+
+        base.ConfigureMocks(user, command, overrides);
+    }
 
     public ChangeUsernameCommandTests()
     {
@@ -35,89 +30,90 @@ public class ChangeUsernameCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
-        ChangeUsernameCommand command = new(user.Id, "hello");
+        ChangeUsernameCommand command = new(user.Id, ValidUsername);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(command.Username)).Returns(true);
+        ConfigureMocks(user, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
+    }
 
+    [Fact]
+    public async Task Handle_Should_ChangeUsername()
+    {
+        // Arrange
+        User user = CreateDefaultUser();
+
+        ChangeUsernameCommand command = new(user.Id, ValidUsername);
+
+        ConfigureMocks(user, command);
+
+        // Act
+        await commandHandler.Handle(command, default);
+
+        // Assert
         user.Username.Should().Be(command.Username);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnUserNotFound_WhenGetByIdAsyncReturnsNull()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
-        ChangeUsernameCommand command = new(user.Id, "hello");
+        ChangeUsernameCommand command = new(user.Id, ValidUsername);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
+        ConfigureMocks(user, command, overrides: () =>
+        {
+            userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(UserErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnUsernameTooLong_WhenUsernameIsLongerThanMaxLength()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
-        ChangeUsernameCommand command = new(user.Id, "thisusernameiswaytoolong");
+        string usernameLongerThanMaxLength = string.Empty.PadLeft(User.UsernameMaxLength + 1);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(command.Username)).Returns(true);
+        ChangeUsernameCommand command = new(user.Id, usernameLongerThanMaxLength);
 
+        ConfigureMocks(user, command);
+
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(UserErrors.UsernameTooLong);
     }
 
     [Fact]
     public async Task Handle_Should_CallUserRepositoryUpdate()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
-        ChangeUsernameCommand command = new(user.Id, "hello");
+        ChangeUsernameCommand command = new(user.Id, ValidUsername);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(command.Username)).Returns(true);
+        ConfigureMocks(user, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         userRepositoryMock
             .Received(1)
             .Update(Arg.Is<User>(u => u.Id == command.UserId));
