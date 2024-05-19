@@ -26,6 +26,11 @@ public abstract class BaseUserTest<T>
         return RolesList.Create([]).Value;
     }
 
+    protected virtual void ConfigureMocks(T command, Action? overrides = null)
+    {
+        overrides?.Invoke();
+    }
+
     protected virtual void ConfigureMocks(User user, T command, Action? overrides = null)
     {
         overrides?.Invoke();

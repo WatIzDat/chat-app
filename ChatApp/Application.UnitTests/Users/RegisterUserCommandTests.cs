@@ -4,7 +4,7 @@ using SharedKernel;
 
 namespace Application.UnitTests.Users;
 
-public class RegisterUserCommandTests
+public class RegisterUserCommandTests : BaseUserTest<RegisterUserCommand>
 {
     private static readonly RegisterUserCommand Command = new(
         "Full name", "test@test.com", "test");
@@ -12,6 +12,20 @@ public class RegisterUserCommandTests
     private readonly RegisterUserCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
     private readonly IDateTimeOffsetProvider dateTimeOffsetProviderMock;
+
+    protected override void ConfigureMocks(RegisterUserCommand command, Action? overrides = null)
+    {
+        Result<Email> emailResult = Email.Create(command.Email);
+
+        if (emailResult.IsSuccess)
+        {
+            userRepositoryMock.IsEmailUniqueAsync(Arg.Is(emailResult.Value)).Returns(true);
+        }
+
+        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(command.Username)).Returns(true);
+
+        base.ConfigureMocks(command, overrides);
+    }
 
     public RegisterUserCommandTests()
     {
@@ -24,62 +38,80 @@ public class RegisterUserCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        userRepositoryMock.IsEmailUniqueAsync(Arg.Is(Email.Create(Command.Email).Value)).Returns(true);
-        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(Command.Username)).Returns(true);
+        // Arrange
+        ConfigureMocks(Command);
 
+        // Act
         Result<Guid> result = await commandHandler.Handle(Command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
     public async Task Handle_Should_ReturnEmailInvalidFormat_WhenEmailHasInvalidFormat()
     {
+        // Arrange
         RegisterUserCommand invalidEmailCommand = new(
             Command.Username,
             "thisisaninvalidemail",
-            "test");
+            Command.ClerkId);
 
+        ConfigureMocks(invalidEmailCommand);
+
+        // Act
         Result<Guid> result = await commandHandler.Handle(invalidEmailCommand, default);
 
+        // Assert
         result.Error.Should().Be(EmailErrors.InvalidFormat);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnEmailNotUnique_WhenIsEmailUniqueAsyncReturnsFalse()
     {
-        userRepositoryMock.IsEmailUniqueAsync(Arg.Is(Email.Create(Command.Email).Value)).Returns(false);
+        // Arrange
+        ConfigureMocks(Command, overrides: () =>
+        {
+            userRepositoryMock.IsEmailUniqueAsync(Arg.Is(Email.Create(Command.Email).Value)).Returns(false);
+        });
 
+        // Act
         Result<Guid> result = await commandHandler.Handle(Command, default);
 
+        // Assert
         result.Error.Should().Be(UserErrors.EmailNotUnique);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnUsernameTooLong_WhenUsernameIsLongerThanMaxLength()
     {
-        userRepositoryMock.IsEmailUniqueAsync(Arg.Is(Email.Create(Command.Email).Value)).Returns(true);
+        // Arrange
+        string usernameLongerThanMaxLength = string.Empty.PadLeft(User.UsernameMaxLength + 1);
 
         RegisterUserCommand usernameTooLongCommand = new(
-            "thisusernameiswaytoolong",
+            usernameLongerThanMaxLength,
             Command.Email,
-            "test");
+            Command.ClerkId);
 
-        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(usernameTooLongCommand.Username)).Returns(true);
+        ConfigureMocks(usernameTooLongCommand);
 
+        // Act
         Result<Guid> result = await commandHandler.Handle(usernameTooLongCommand, default);
 
+        // Assert
         result.Error.Should().Be(UserErrors.UsernameTooLong);
     }
 
     [Fact]
     public async Task Handle_Should_CallUserRepositoryInsert()
     {
-        userRepositoryMock.IsEmailUniqueAsync(Arg.Is(Email.Create(Command.Email).Value)).Returns(true);
-        userRepositoryMock.IsUsernameUniqueAsync(Arg.Is(Command.Username)).Returns(true);
+        // Arrange
+        ConfigureMocks(Command);
 
+        // Act
         Result<Guid> result = await commandHandler.Handle(Command, default);
 
+        // Assert
         userRepositoryMock
             .Received(1)
             .Insert(Arg.Is<User>(u => u.Id == result.Value));
