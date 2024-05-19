@@ -7,6 +7,8 @@ namespace Application.UnitTests.Users;
 
 public class ChangeEmailCommandTests : BaseUserTest<ChangeEmailCommand>
 {
+    private const string ValidEmail = "test@test.com";
+
     private readonly ChangeEmailCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
 
@@ -30,9 +32,7 @@ public class ChangeEmailCommandTests : BaseUserTest<ChangeEmailCommand>
         // Arrange
         User user = CreateDefaultUser();
 
-        string validEmail = "test@test.com";
-
-        ChangeEmailCommand command = new(user.Id, validEmail);
+        ChangeEmailCommand command = new(user.Id, ValidEmail);
 
         ConfigureMocks(user, command);
 
@@ -49,9 +49,7 @@ public class ChangeEmailCommandTests : BaseUserTest<ChangeEmailCommand>
         // Arrange
         User user = CreateDefaultUser();
 
-        string validEmail = "test@test.com";
-
-        ChangeEmailCommand command = new(user.Id, validEmail);
+        ChangeEmailCommand command = new(user.Id, ValidEmail);
 
         ConfigureMocks(user, command);
 
@@ -68,7 +66,7 @@ public class ChangeEmailCommandTests : BaseUserTest<ChangeEmailCommand>
         // Arrange
         User user = CreateDefaultUser();
 
-        ChangeEmailCommand command = new(user.Id, "hello@hello.com");
+        ChangeEmailCommand command = new(user.Id, ValidEmail);
 
         ConfigureMocks(user, command, overrides: () =>
         {
@@ -105,7 +103,7 @@ public class ChangeEmailCommandTests : BaseUserTest<ChangeEmailCommand>
         // Arrange
         User user = CreateDefaultUser();
 
-        ChangeEmailCommand command = new(user.Id, "hello@hello.com");
+        ChangeEmailCommand command = new(user.Id, ValidEmail);
 
         ConfigureMocks(user, command);
 
