@@ -5,27 +5,24 @@ using SharedKernel;
 
 namespace Application.UnitTests.Users;
 
-public class RemoveRoleCommandTests
+public class RemoveRoleCommandTests : BaseUserTest<RemoveRoleCommand>
 {
-    private static readonly Guid RoleId = new("ac6338e8-cb43-499a-b8c3-511ac099362e");
+    protected override RolesList CreateDefaultRolesList()
+    {
+        return RolesList.Create([Guid.Empty]).Value;
+    }
 
-    private static readonly DiscussionsList Discussions =
-        DiscussionsList.Create([Guid.NewGuid()]).Value;
-
-    private static readonly RolesList Roles =
-        RolesList.Create([RoleId]).Value;
-
-    private static readonly User User = User.Create(
-            "test123",
-            Email.Create("test@test.com").Value,
-            DateTimeOffset.UtcNow,
-            AboutSection.Create("This is a test.").Value,
-            Discussions,
-            Roles,
-            "test").Value;
+    private static readonly Guid RoleId = Guid.Empty;
 
     private readonly RemoveRoleCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
+
+    protected override void ConfigureMocks(User user, RemoveRoleCommand command, Action? overrides = null)
+    {
+        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+
+        base.ConfigureMocks(user, command, overrides);
+    }
 
     public RemoveRoleCommandTests()
     {
@@ -37,90 +34,90 @@ public class RemoveRoleCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         RemoveRoleCommand command = new(user.Id, RoleId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        ConfigureMocks(user, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
+    }
 
+    [Fact]
+    public async Task Handle_Should_RemoveRole()
+    {
+        // Arrange
+        User user = CreateDefaultUser();
+
+        RemoveRoleCommand command = new(user.Id, RoleId);
+
+        ConfigureMocks(user, command);
+
+        // Act
+        await commandHandler.Handle(command, default);
+
+        // Assert
         user.Roles.Value.Should().NotContain(command.RoleId);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnUserNotFound_WhenGetByIdAsyncReturnsNull()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         RemoveRoleCommand command = new(user.Id, RoleId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
+        ConfigureMocks(user, command, overrides: () =>
+        {
+            userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(UserErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnRoleNotFound_WhenGuidIsNotInRolesList()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
-
-        RemoveRoleCommand command = new(user.Id, RoleId);
-
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        // Arrange
+        User user = CreateDefaultUser();
 
         RemoveRoleCommand roleNotFoundCommand = new(
-            command.UserId,
+            user.Id,
             Guid.NewGuid());
 
+        ConfigureMocks(user, roleNotFoundCommand);
+
+        // Act
         Result result = await commandHandler.Handle(roleNotFoundCommand, default);
 
+        // Assert
         result.Error.Should().Be(UserErrors.RoleNotFound);
     }
 
     [Fact]
     public async Task Handle_Should_CallUserRepositoryUpdate()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         RemoveRoleCommand command = new(user.Id, RoleId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        ConfigureMocks(user, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         userRepositoryMock
             .Received(1)
             .Update(Arg.Is<User>(u => u.Id == command.UserId));
