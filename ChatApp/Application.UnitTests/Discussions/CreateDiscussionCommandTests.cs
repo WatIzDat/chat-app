@@ -15,14 +15,16 @@ public class CreateDiscussionCommandTests
     private readonly IDiscussionRepository discussionRepositoryMock;
     private readonly IUserRepository userRepositoryMock;
     private readonly IDateTimeOffsetProvider dateTimeOffsetProviderMock;
+    private readonly DiscussionService discussionServiceMock;
 
     public CreateDiscussionCommandTests()
     {
         discussionRepositoryMock = Substitute.For<IDiscussionRepository>();
         userRepositoryMock = Substitute.For<IUserRepository>();
         dateTimeOffsetProviderMock = Substitute.For<IDateTimeOffsetProvider>();
+        discussionServiceMock = Substitute.For<DiscussionService>();
 
-        commandHandler = new CreateDiscussionCommandHandler(discussionRepositoryMock, userRepositoryMock, dateTimeOffsetProviderMock);
+        commandHandler = new CreateDiscussionCommandHandler(userRepositoryMock, dateTimeOffsetProviderMock, discussionServiceMock);
     }
 
     [Fact]

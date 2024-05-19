@@ -8,26 +8,45 @@ namespace Application.UnitTests.Users;
 
 public class AddRoleCommandTests
 {
-    private static readonly Guid RoleId = new("ac6338e8-cb43-499a-b8c3-511ac099362e");
-
-    private static readonly DiscussionsList Discussions =
-        DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
-
-    private static readonly RolesList Roles =
-        RolesList.Create([Guid.NewGuid()]).Value;
-
-    private static readonly User User = User.Create(
+    private static User CreateDefaultUser()
+    {
+        return User.Create(
             "test123",
             Email.Create("test@test.com").Value,
-            DateTimeOffset.UtcNow,
+            DateTimeOffset.MinValue,
             AboutSection.Create("This is a test.").Value,
-            Discussions,
-            Roles,
+            CreateDefaultDiscussionsList(),
+            CreateDefaultRolesList(),
             "test").Value;
+    }
+
+    private static DiscussionsList CreateDefaultDiscussionsList()
+    {
+        // Discussions list has two arbitrary discussions by default to simplify testing
+        return DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
+    }
+
+    private static RolesList CreateDefaultRolesList()
+    {
+        return RolesList.Create([]).Value;
+    }
+
+    private static readonly Guid RoleId = Guid.Empty;
 
     private readonly AddRoleCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
     private readonly IRoleRepository roleRepositoryMock;
+
+    private void ConfigureMocks(User user, AddRoleCommand command, Action? overrides = null)
+    {
+        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
+        roleRepositoryMock
+            .RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions))
+            .Returns(true);
+
+        overrides?.Invoke();
+    }
 
     public AddRoleCommandTests()
     {
@@ -40,161 +59,144 @@ public class AddRoleCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         AddRoleCommand command = new(user.Id, RoleId);
         
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
-        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
+        ConfigureMocks(user, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
     public async Task Handle_Should_ReturnUserNotFound_WhenGetByIdAsyncReturnsNull()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         AddRoleCommand command = new(user.Id, RoleId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
-        roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
-        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
+        ConfigureMocks(user, command, overrides: () =>
+        {
+            userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(UserErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnRoleNotFound_WhenRoleExistsAsyncReturnsFalse()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         AddRoleCommand command = new(user.Id, RoleId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(false);
-        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
+        ConfigureMocks(user, command, overrides: () =>
+        {
+            roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(false);
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(RoleErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnRoleNotInDiscussionsList_WhenRoleInDiscussionsListAsyncReturnsFalse()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         AddRoleCommand command = new(user.Id, RoleId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
-        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(false);
+        ConfigureMocks(user, command, overrides: () =>
+        {
+            roleRepositoryMock
+                .RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions))
+                .Returns(false);
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(UserErrors.RoleNotInDiscussionsList);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnDuplicateRoles_WhenDuplicateGuidIsAdded()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
-        AddRoleCommand command = new(user.Id, user.Roles.Value[0]);
+        AddRoleCommand command = new(user.Id, RoleId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
-        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
+        ConfigureMocks(user, command);
 
+        await commandHandler.Handle(command, default);
+
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(RolesListErrors.DuplicateRoles);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnTooManyRoles_WhenListIsLongerThanDiscussionsList()
     {
+        // Arrange
+        User referenceUser = CreateDefaultUser();
+
+        DiscussionsList discussionsList = DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
+        RolesList rolesListWithSameLength = RolesList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
+
         User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            RolesList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value,
-            User.ClerkId).Value;
+            referenceUser.Username,
+            referenceUser.Email,
+            referenceUser.DateCreatedUtc,
+            referenceUser.AboutSection,
+            discussionsList,
+            rolesListWithSameLength,
+            referenceUser.ClerkId).Value;
 
         AddRoleCommand command = new(user.Id, RoleId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
-        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
+        ConfigureMocks(user, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(RolesListErrors.TooManyRoles);
     }
 
     [Fact]
     public async Task Handle_Should_CallUserRepositoryUpdate()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
         AddRoleCommand command = new(user.Id, RoleId);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-        roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
-        roleRepositoryMock.RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions)).Returns(true);
+        ConfigureMocks(user, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         userRepositoryMock
             .Received(1)
             .Update(Arg.Is<User>(u => u.Id == command.UserId));

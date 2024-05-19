@@ -19,6 +19,7 @@ public class SendMessageCommandTests
     private readonly IDiscussionRepository discussionRepositoryMock;
     private readonly IBanRepository banRepositoryMock;
     private readonly IDateTimeOffsetProvider dateTimeOffsetProviderMock;
+    private readonly IMessageNotifications messageNotificationsMock;
 
     public SendMessageCommandTests()
     {
@@ -27,13 +28,15 @@ public class SendMessageCommandTests
         discussionRepositoryMock = Substitute.For<IDiscussionRepository>();
         banRepositoryMock = Substitute.For<IBanRepository>();
         dateTimeOffsetProviderMock = Substitute.For<IDateTimeOffsetProvider>();
+        messageNotificationsMock = Substitute.For<IMessageNotifications>();
 
         commandHandler = new SendMessageCommandHandler(
             messageRepositoryMock,
             userRepositoryMock,
             discussionRepositoryMock,
             banRepositoryMock,
-            dateTimeOffsetProviderMock);
+            dateTimeOffsetProviderMock,
+            messageNotificationsMock);
     }
 
     [Fact]
