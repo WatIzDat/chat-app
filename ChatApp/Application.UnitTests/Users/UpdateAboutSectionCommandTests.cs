@@ -5,25 +5,19 @@ using SharedKernel;
 
 namespace Application.UnitTests.Users;
 
-public class UpdateAboutSectionCommandTests
+public class UpdateAboutSectionCommandTests : BaseUserTest<UpdateAboutSectionCommand>
 {
-    private static readonly DiscussionsList Discussions =
-        DiscussionsList.Create([Guid.NewGuid()]).Value;
-
-    private static readonly RolesList Roles =
-        RolesList.Create([Guid.NewGuid()]).Value;
-
-    private static readonly User User = User.Create(
-            "test123",
-            Email.Create("test@test.com").Value,
-            DateTimeOffset.UtcNow,
-            AboutSection.Create("This is a test.").Value,
-            Discussions,
-            Roles,
-            "test").Value;
+    private const string ValidAboutSection = "test";
 
     private readonly UpdateAboutSectionCommandHandler commandHandler;
     private readonly IUserRepository userRepositoryMock;
+
+    protected override void ConfigureMocks(User user, UpdateAboutSectionCommand command, Action? overrides = null)
+    {
+        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+
+        base.ConfigureMocks(user, command, overrides);
+    }
 
     public UpdateAboutSectionCommandTests()
     {
@@ -35,93 +29,90 @@ public class UpdateAboutSectionCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
-        UpdateAboutSectionCommand command = new(user.Id, "new about section");
+        UpdateAboutSectionCommand command = new(user.Id, ValidAboutSection);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        ConfigureMocks(user, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
+    }
 
+    [Fact]
+    public async Task Handle_Should_ChangeAboutSection()
+    {
+        // Arrange
+        User user = CreateDefaultUser();
+
+        UpdateAboutSectionCommand command = new(user.Id, ValidAboutSection);
+
+        ConfigureMocks(user, command);
+
+        // Act
+        await commandHandler.Handle(command, default);
+
+        // Assert
         user.AboutSection.Should().Be(AboutSection.Create(command.AboutSection).Value);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnUserNotFound_WhenGetByIdAsyncReturnsNull()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
-        UpdateAboutSectionCommand command = new(user.Id, "new about section");
+        UpdateAboutSectionCommand command = new(user.Id, ValidAboutSection);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
+        ConfigureMocks(user, command, overrides: () =>
+        {
+            userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).ReturnsNull();
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(UserErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnAboutSectionTooLong_WhenAboutSectionIsLongerThanMaxLength()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
-        string aboutSection = string.Empty;
+        string aboutSectionLongerThanMaxLength = string.Empty.PadLeft(AboutSection.MaxLength + 1);
 
-        for (int i = 0; i < AboutSection.MaxLength + 1; i++)
-        {
-            aboutSection += "a";
-        }
+        UpdateAboutSectionCommand command = new(user.Id, aboutSectionLongerThanMaxLength);
 
-        UpdateAboutSectionCommand command = new(user.Id, aboutSection);
+        ConfigureMocks(user, command);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
-
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(AboutSectionErrors.TooLong);
     }
 
     [Fact]
     public async Task Handle_Should_CallUserRepositoryUpdate()
     {
-        User user = User.Create(
-            User.Username,
-            User.Email,
-            User.DateCreatedUtc,
-            User.AboutSection,
-            User.Discussions,
-            User.Roles,
-            User.ClerkId).Value;
+        // Arrange
+        User user = CreateDefaultUser();
 
-        UpdateAboutSectionCommand command = new(user.Id, "new about section");
+        UpdateAboutSectionCommand command = new(user.Id, ValidAboutSection);
 
-        userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
+        ConfigureMocks(user, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         userRepositoryMock
             .Received(1)
             .Update(Arg.Is<User>(u => u.Id == command.UserId));
