@@ -6,29 +6,11 @@ using SharedKernel;
 
 namespace Application.UnitTests.Users;
 
-public class AddRoleCommandTests
+public class AddRoleCommandTests : BaseUserTest<AddRoleCommand>
 {
-    private static User CreateDefaultUser()
+    protected override DiscussionsList CreateDefaultDiscussionsList()
     {
-        return User.Create(
-            "test123",
-            Email.Create("test@test.com").Value,
-            DateTimeOffset.MinValue,
-            AboutSection.Create("This is a test.").Value,
-            CreateDefaultDiscussionsList(),
-            CreateDefaultRolesList(),
-            "test").Value;
-    }
-
-    private static DiscussionsList CreateDefaultDiscussionsList()
-    {
-        // Discussions list has two arbitrary discussions by default to simplify testing
         return DiscussionsList.Create([Guid.NewGuid(), Guid.NewGuid()]).Value;
-    }
-
-    private static RolesList CreateDefaultRolesList()
-    {
-        return RolesList.Create([]).Value;
     }
 
     private static readonly Guid RoleId = Guid.Empty;
@@ -37,7 +19,7 @@ public class AddRoleCommandTests
     private readonly IUserRepository userRepositoryMock;
     private readonly IRoleRepository roleRepositoryMock;
 
-    private void ConfigureMocks(User user, AddRoleCommand command, Action? overrides = null)
+    protected override void ConfigureMocks(User user, AddRoleCommand command, Action? overrides = null)
     {
         userRepositoryMock.GetByIdAsync(Arg.Is(command.UserId)).Returns(user);
         roleRepositoryMock.RoleExistsAsync(Arg.Is(command.RoleId)).Returns(true);
@@ -45,7 +27,7 @@ public class AddRoleCommandTests
             .RoleInDiscussionsListAsync(Arg.Is(command.RoleId), Arg.Is(user.Discussions))
             .Returns(true);
 
-        overrides?.Invoke();
+        base.ConfigureMocks(user, command, overrides);
     }
 
     public AddRoleCommandTests()
