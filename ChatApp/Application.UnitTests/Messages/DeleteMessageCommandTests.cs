@@ -5,13 +5,17 @@ using SharedKernel;
 
 namespace Application.UnitTests.Messages;
 
-public class DeleteMessageCommandTests
+public class DeleteMessageCommandTests : BaseMessageTest<DeleteMessageCommand>
 {
-    private static readonly Message Message = Message.Create(
-        Guid.NewGuid(), Guid.NewGuid(), "This is a test.", DateTimeOffset.UtcNow).Value;
-
     private readonly DeleteMessageCommandHandler commandHandler;
     private readonly IMessageRepository messageRepositoryMock;
+
+    protected override void ConfigureMocks(Message message, DeleteMessageCommand command, Action? overrides = null)
+    {
+        messageRepositoryMock.GetByIdAsync(Arg.Is(command.MessageId)).Returns(message);
+
+        base.ConfigureMocks(message, command, overrides);
+    }
 
     public DeleteMessageCommandTests()
     {
@@ -23,54 +27,54 @@ public class DeleteMessageCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        Message message = Message.Create(
-            Message.UserId,
-            Message.DiscussionId,
-            Message.Contents,
-            Message.DateSentUtc).Value;
+        // Arrange
+        Message message = CreateDefaultMessage();
 
         DeleteMessageCommand command = new(message.Id);
 
-        messageRepositoryMock.GetByIdAsync(Arg.Is(command.MessageId)).Returns(message);
+        ConfigureMocks(message, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
     public async Task Handle_Should_ReturnMessageNotFound_WhenGetByIdAsyncReturnsNull()
     {
-        Message message = Message.Create(
-            Message.UserId,
-            Message.DiscussionId,
-            Message.Contents,
-            Message.DateSentUtc).Value;
+        // Arrange
+        Message message = CreateDefaultMessage();
 
         DeleteMessageCommand command = new(message.Id);
 
-        messageRepositoryMock.GetByIdAsync(Arg.Is(command.MessageId)).ReturnsNull();
+        ConfigureMocks(message, command, overrides: () =>
+        {
+            messageRepositoryMock.GetByIdAsync(Arg.Is(command.MessageId)).ReturnsNull();
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(MessageErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_CallMessageRepositoryDelete()
     {
-        Message message = Message.Create(
-            Message.UserId,
-            Message.DiscussionId,
-            Message.Contents,
-            Message.DateSentUtc).Value;
+        // Arrange
+        Message message = CreateDefaultMessage();
 
         DeleteMessageCommand command = new(message.Id);
 
-        messageRepositoryMock.GetByIdAsync(Arg.Is(command.MessageId)).Returns(message);
+        ConfigureMocks(message, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         messageRepositoryMock
             .Received(1)
             .Delete(Arg.Is<Message>(m => m.Id == command.MessageId));
