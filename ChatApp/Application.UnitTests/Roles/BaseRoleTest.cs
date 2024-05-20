@@ -17,6 +17,11 @@ public abstract class BaseRoleTest<T>
         return [];
     }
 
+    protected virtual void ConfigureMocks(T command, Action? overrides = null)
+    {
+        overrides?.Invoke();
+    }
+
     protected virtual void ConfigureMocks(Role role, T command, Action? overrides = null)
     {
         overrides?.Invoke();
