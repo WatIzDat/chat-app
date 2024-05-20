@@ -5,13 +5,24 @@ using SharedKernel;
 
 namespace Application.UnitTests.Roles;
 
-public class RemovePermissionCommandTests
+public class RemovePermissionCommandTests : BaseRoleTest<RemovePermissionCommand>
 {
-    private static readonly Role Role = Role.Create(
-        Guid.NewGuid(), "test", [Permission.BanUser, Permission.DeleteMessage]).Value;
+    private static readonly Permission TestPermission = Permission.KickUser;
+    
+    protected override List<Permission> CreateDefaultPermissionsList()
+    {
+        return [TestPermission];
+    }
 
     private readonly RemovePermissionCommandHandler commandHandler;
     private readonly IRoleRepository roleRepositoryMock;
+
+    protected override void ConfigureMocks(Role role, RemovePermissionCommand command, Action? overrides = null)
+    {
+        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+
+        base.ConfigureMocks(role, command, overrides);
+    }
 
     public RemovePermissionCommandTests()
     {
@@ -23,87 +34,109 @@ public class RemovePermissionCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        RemovePermissionCommand command = new(role.Id, Permission.BanUser.Value);
+        RemovePermissionCommand command = new(role.Id, TestPermission.Value);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        ConfigureMocks(role, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
+    }
 
-        role.Permissions.Should().NotContain(Permission.BanUser);
+    [Fact]
+    public async Task Handle_Should_RemovePermission()
+    {
+        // Arrange
+        Role role = CreateDefaultRole();
+
+        RemovePermissionCommand command = new(role.Id, TestPermission.Value);
+
+        ConfigureMocks(role, command);
+
+        // Act
+        await commandHandler.Handle(command, default);
+
+        // Assert
+        role.Permissions.Should().NotContain(TestPermission);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnRoleNotFound_WhenGetByIdAsyncReturnsNull()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        RemovePermissionCommand command = new(role.Id, Permission.BanUser.Value);
+        RemovePermissionCommand command = new(role.Id, TestPermission.Value);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).ReturnsNull();
+        ConfigureMocks(role, command, overrides: () =>
+        {
+            roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).ReturnsNull();
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(RoleErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnPermissionNotAllowed_WhenPermissionIsNotInListOfAllowedPermissions()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        RemovePermissionCommand command = new(role.Id, "this permission is not allowed");
+        string invalidPermission = "";
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        RemovePermissionCommand command = new(role.Id, invalidPermission);
 
+        ConfigureMocks(role, command);
+
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(PermissionErrors.NotAllowed);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnPermissionNotFound_WhenPermissionIsNotInPermissionsList()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        RemovePermissionCommand command = new(role.Id, Permission.KickUser.Value);
+        string permissionNotInPermissionsList = Permission.BanUser.Value;
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        RemovePermissionCommand command = new(role.Id, permissionNotInPermissionsList);
 
+        ConfigureMocks(role, command);
+
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(RoleErrors.PermissionNotFound);
     }
 
     [Fact]
     public async Task Handle_Should_CallRoleRepositoryUpdate()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        RemovePermissionCommand command = new(role.Id, Permission.BanUser.Value);
+        RemovePermissionCommand command = new(role.Id, TestPermission.Value);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        ConfigureMocks(role, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         roleRepositoryMock
             .Received(1)
             .Update(Arg.Is<Role>(r => r.Id == command.RoleId));
