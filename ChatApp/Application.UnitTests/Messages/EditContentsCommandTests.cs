@@ -5,13 +5,19 @@ using SharedKernel;
 
 namespace Application.UnitTests.Messages;
 
-public class EditContentsCommandTests
+public class EditContentsCommandTests : BaseMessageTest<EditContentsCommand>
 {
-    private static readonly Message Message = Message.Create(
-        Guid.NewGuid(), Guid.NewGuid(), "This is a test.", DateTimeOffset.UtcNow).Value;
+    private const string ValidContents = "test";
 
     private readonly EditContentsCommandHandler commandHandler;
     private readonly IMessageRepository messageRepositoryMock;
+
+    protected override void ConfigureMocks(Message message, EditContentsCommand command, Action? overrides = null)
+    {
+        messageRepositoryMock.GetByIdAsync(Arg.Is(command.MessageId)).Returns(message);
+
+        base.ConfigureMocks(message, command, overrides);
+    }
 
     public EditContentsCommandTests()
     {
@@ -23,81 +29,90 @@ public class EditContentsCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        Message message = Message.Create(
-            Message.UserId,
-            Message.DiscussionId,
-            Message.Contents,
-            Message.DateSentUtc).Value;
+        // Arrange
+        Message message = CreateDefaultMessage();
 
-        EditContentsCommand command = new(message.Id, "hello");
+        EditContentsCommand command = new(message.Id, ValidContents);
 
-        messageRepositoryMock.GetByIdAsync(Arg.Is(command.MessageId)).Returns(message);
+        ConfigureMocks(message, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
+    }
 
+    [Fact]
+    public async Task Handle_Should_EditContents()
+    {
+        // Arrange
+        Message message = CreateDefaultMessage();
+
+        EditContentsCommand command = new(message.Id, ValidContents);
+
+        ConfigureMocks(message, command);
+
+        // Act
+        await commandHandler.Handle(command, default);
+
+        // Assert
         message.Contents.Should().Be(command.Contents);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnMessageNotFound_WhenGetByIdAsyncReturnsNull()
     {
-        Message message = Message.Create(
-            Message.UserId,
-            Message.DiscussionId,
-            Message.Contents,
-            Message.DateSentUtc).Value;
+        // Arrange
+        Message message = CreateDefaultMessage();
 
-        EditContentsCommand command = new(message.Id, "hello");
+        EditContentsCommand command = new(message.Id, ValidContents);
 
-        messageRepositoryMock.GetByIdAsync(Arg.Is(command.MessageId)).ReturnsNull();
+        ConfigureMocks(message, command, overrides: () =>
+        {
+            messageRepositoryMock.GetByIdAsync(Arg.Is(command.MessageId)).ReturnsNull();
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(MessageErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnContentsTooLong_WhenContentsIsLongerThanMaxLength()
     {
-        Message message = Message.Create(
-            Message.UserId,
-            Message.DiscussionId,
-            Message.Contents,
-            Message.DateSentUtc).Value;
+        // Arrange
+        Message message = CreateDefaultMessage();
 
-        string contents = string.Empty;
+        string contentsLongerThanMaxLength = string.Empty.PadLeft(Message.ContentsMaxLength + 1);
 
-        for (int i = 0; i < Message.ContentsMaxLength + 1; i++)
-        {
-            contents += "a";
-        }
+        EditContentsCommand command = new(message.Id, contentsLongerThanMaxLength);
 
-        EditContentsCommand command = new(message.Id, contents);
+        ConfigureMocks(message, command);
 
-        messageRepositoryMock.GetByIdAsync(Arg.Is(command.MessageId)).Returns(message);
-
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(MessageErrors.ContentsTooLong);
     }
 
     [Fact]
     public async Task Handle_Should_CallMessageRepositoryUpdate()
     {
-        Message message = Message.Create(
-            Message.UserId,
-            Message.DiscussionId,
-            Message.Contents,
-            Message.DateSentUtc).Value;
+        // Arrange
+        Message message = CreateDefaultMessage();
 
-        EditContentsCommand command = new(message.Id, "hello");
+        EditContentsCommand command = new(message.Id, ValidContents);
 
-        messageRepositoryMock.GetByIdAsync(Arg.Is(command.MessageId)).Returns(message);
+        ConfigureMocks(message, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         messageRepositoryMock
             .Received(1)
             .Update(Arg.Is<Message>(m => m.Id == command.MessageId));
