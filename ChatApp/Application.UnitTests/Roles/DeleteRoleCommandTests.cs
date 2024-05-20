@@ -5,13 +5,17 @@ using SharedKernel;
 
 namespace Application.UnitTests.Roles;
 
-public class DeleteRoleCommandTests
+public class DeleteRoleCommandTests : BaseRoleTest<DeleteRoleCommand>
 {
-    private static readonly Role Role = Role.Create(
-        Guid.NewGuid(), "test", [Permission.BanUser, Permission.DeleteMessage]).Value;
-
     private readonly DeleteRoleCommandHandler commandHandler;
     private readonly IRoleRepository roleRepositoryMock;
+
+    protected override void ConfigureMocks(Role role, DeleteRoleCommand command, Action? overrides = null)
+    {
+        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+
+        base.ConfigureMocks(role, command, overrides);
+    }
 
     public DeleteRoleCommandTests()
     {
@@ -23,51 +27,54 @@ public class DeleteRoleCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
         DeleteRoleCommand command = new(role.Id);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        ConfigureMocks(role, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
     }
     
     [Fact]
     public async Task Handle_Should_ReturnRoleNotFound_WhenGetByIdAsyncReturnsNull()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
         DeleteRoleCommand command = new(role.Id);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).ReturnsNull();
+        ConfigureMocks(role, command, overrides: () =>
+        {
+            roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).ReturnsNull();
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(RoleErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_CallRoleRepositoryDelete()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
         DeleteRoleCommand command = new(role.Id);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        ConfigureMocks(role, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         roleRepositoryMock
             .Received(1)
             .Delete(Arg.Is<Role>(r => r.Id == command.RoleId));
