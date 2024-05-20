@@ -5,13 +5,20 @@ using SharedKernel;
 
 namespace Application.UnitTests.Roles;
 
-public class EditNameCommandTests
+public class EditNameCommandTests : BaseRoleTest<EditNameCommand>
 {
-    private static readonly Role Role = Role.Create(
-        Guid.NewGuid(), "test", [Permission.BanUser, Permission.DeleteMessage]).Value;
+    private const string ValidName = "test";
 
     private readonly EditNameCommandHandler commandHandler;
     private readonly IRoleRepository roleRepositoryMock;
+
+    protected override void ConfigureMocks(Role role, EditNameCommand command, Action? overrides = null)
+    {
+        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        roleRepositoryMock.DuplicateRoleNamesInDiscussionAsync(command.Name, role.DiscussionId).Returns(false);
+
+        base.ConfigureMocks(role, command, overrides);
+    }
 
     public EditNameCommandTests()
     {
@@ -23,90 +30,112 @@ public class EditNameCommandTests
     [Fact]
     public async Task Handle_Should_ReturnSuccess()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        EditNameCommand command = new(role.Id, "hello");
+        EditNameCommand command = new(role.Id, ValidName);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
+        ConfigureMocks(role, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
+    }
 
+    [Fact]
+    public async Task Handle_Should_EditName()
+    {
+        // Arrange
+        Role role = CreateDefaultRole();
+
+        EditNameCommand command = new(role.Id, ValidName);
+
+        ConfigureMocks(role, command);
+
+        // Act
+        await commandHandler.Handle(command, default);
+
+        // Assert
         role.Name.Should().Be(command.Name);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnRoleNotFound_WhenGetByIdAsyncReturnsNull()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        EditNameCommand command = new(role.Id, "hello");
+        EditNameCommand command = new(role.Id, ValidName);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).ReturnsNull();
+        ConfigureMocks(role, command, overrides: () =>
+        {
+            roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).ReturnsNull();
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(RoleErrors.NotFound);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnDuplicateRoleNamesInDiscussion_WhenDuplicateRoleNamesInDiscussionAsyncReturnsTrue()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        EditNameCommand command = new(role.Id, "hello");
+        EditNameCommand command = new(role.Id, ValidName);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
-        roleRepositoryMock.DuplicateRoleNamesInDiscussionAsync(command.Name, role.DiscussionId).Returns(true);
+        ConfigureMocks(role, command, overrides: () =>
+        {
+            roleRepositoryMock
+                .DuplicateRoleNamesInDiscussionAsync(command.Name, role.DiscussionId)
+                .Returns(true);
+        });
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(RoleErrors.DuplicateRoleNamesInDiscussion);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnNameTooLong_WhenNameIsLongerThanMaxLength()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        EditNameCommand command = new(role.Id, "thisnameiswaytoolongaaaaaaaaaaaaaaaa");
+        string nameLongerThanMaxLength = string.Empty.PadLeft(Role.NameMaxLength + 1);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
-        roleRepositoryMock.DuplicateRoleNamesInDiscussionAsync(command.Name, role.DiscussionId).Returns(false);
+        EditNameCommand command = new(role.Id, nameLongerThanMaxLength);
 
+        ConfigureMocks(role, command);
+
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         result.Error.Should().Be(RoleErrors.NameTooLong);
     }
 
     [Fact]
     public async Task Handle_Should_CallRoleRepositoryUpdate()
     {
-        Role role = Role.Create(
-            Role.DiscussionId,
-            Role.Name,
-            Role.Permissions.ToList()).Value;
+        // Arrange
+        Role role = CreateDefaultRole();
 
-        EditNameCommand command = new(role.Id, "hello");
+        EditNameCommand command = new(role.Id, ValidName);
 
-        roleRepositoryMock.GetByIdAsync(Arg.Is(command.RoleId)).Returns(role);
-        roleRepositoryMock.DuplicateRoleNamesInDiscussionAsync(command.Name, role.DiscussionId).Returns(false);
+        ConfigureMocks(role, command);
 
+        // Act
         Result result = await commandHandler.Handle(command, default);
 
+        // Assert
         roleRepositoryMock
             .Received(1)
             .Update(Arg.Is<Role>(r => r.Id == command.RoleId));
